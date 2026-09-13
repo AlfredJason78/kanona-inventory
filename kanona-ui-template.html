@@ -1,0 +1,2263 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kanona — UI Template</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   DESIGN TOKENS — copy these into tailwind.config.ts
+   ============================================================ */
+:root{
+  --primary:#2563EB;      --primary-hover:#1D4ED8;
+  --success:#22C55E;      --danger:#EF4444;      --warning:#F59E0B;
+  --bg:#F8FAFC;           --card:#FFFFFF;        --border:#E5E7EB;
+  --text:#111827;         --text-2:#6B7280;      --text-3:#9CA3AF;
+  --divider:#F1F5F9;      --hover:#F8FAFC;
+
+  --blue-bg:#EFF6FF;      --blue-fg:#1D4ED8;     --blue-br:#BFDBFE;
+  --green-bg:#ECFDF5;     --green-fg:#15803D;    --green-br:#BBF7D0;
+  --red-bg:#FEF2F2;       --red-fg:#B91C1C;      --red-br:#FECACA;
+  --amber-bg:#FFFBEB;     --amber-fg:#B45309;    --amber-br:#FDE68A;
+  --grey-bg:#F3F4F6;      --grey-fg:#374151;
+
+  --r:10px; --r-sm:8px; --r-lg:12px;
+  --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:400 14px/1.5 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--primary);text-decoration:none}
+a:hover{color:var(--primary-hover)}
+input,select,button,textarea{font-family:inherit}
+::placeholder{color:var(--text-3)}
+table{border-collapse:collapse;width:100%}
+h1,h2,h3{margin:0}
+
+/* ---------- App shell ---------- */
+.app{display:flex;flex-direction:column;min-height:100vh;min-width:1180px}
+.navbar{height:72px;flex:none;background:var(--card);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;padding:0 32px;position:relative;z-index:30}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{width:32px;height:32px;border-radius:var(--r-sm);background:var(--primary);
+  display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:16px}
+.brand-name{font-size:18px;font-weight:600;letter-spacing:-.01em}
+.body{flex:1;display:flex;min-height:0}
+.sidebar{width:250px;flex:none;background:var(--card);border-right:1px solid var(--border);padding:16px 12px}
+.side-label{padding:0 10px 8px;font-size:11px;font-weight:600;letter-spacing:.06em;color:var(--text-3);text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:10px;width:100%;height:40px;padding:0 12px;margin-bottom:2px;
+  border:none;border-radius:var(--r-sm);background:transparent;color:var(--text-2);
+  font-size:14px;font-weight:500;cursor:pointer;text-align:left}
+.nav-item:hover{background:var(--hover);color:var(--text)}
+.nav-item.active{background:var(--blue-bg);color:var(--primary);font-weight:600}
+.main{flex:1;min-width:0;padding:32px}
+
+/* ---------- Typography ---------- */
+.page-title{font-size:32px;font-weight:700;letter-spacing:-.02em}
+.page-sub{margin:6px 0 0;font-size:14px;color:var(--text-2)}
+.card-title{font-size:18px;font-weight:600}
+.mono{font-family:var(--mono);font-size:13px}
+.muted{color:var(--text-2)}
+
+/* ---------- Card ---------- */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r)}
+.card-head{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border)}
+.card-pad{padding:24px}
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:24px}
+
+/* ---------- Buttons ---------- */
+.btn{height:40px;padding:0 16px;border-radius:var(--r-sm);font-size:14px;font-weight:500;
+  cursor:pointer;display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.btn-primary{background:var(--primary);border:none;color:#fff}
+.btn-primary:hover{background:var(--primary-hover)}
+.btn-secondary{background:#fff;border:1px solid var(--border);color:var(--grey-fg)}
+.btn-secondary:hover{background:var(--hover)}
+.btn-link{background:#fff;border:1px solid var(--blue-br);color:var(--primary);height:36px;padding:0 12px;font-size:13px}
+.btn-link:hover{background:var(--blue-bg)}
+.btn-danger{background:var(--danger);border:none;color:#fff}
+.btn-danger:hover{background:#DC2626}
+.btn:disabled{background:var(--hover);border:1px solid var(--border);color:var(--text-3);cursor:not-allowed}
+.btn-sm{height:32px;padding:0 12px;font-size:13px}
+.icon-btn{width:32px;height:32px;border-radius:var(--r-sm);border:1px solid transparent;background:transparent;
+  color:var(--text-2);display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+.icon-btn:hover{background:var(--divider);color:var(--text)}
+.icon-btn.del:hover{background:var(--red-bg);color:var(--danger)}
+
+/* ---------- Form ---------- */
+.field{display:flex;flex-direction:column}
+.label{font-size:14px;font-weight:500;margin-bottom:8px}
+.req{color:var(--danger)}
+.input,.select{height:44px;border:1px solid var(--border);border-radius:var(--r);padding:0 14px;
+  font-size:14px;color:var(--text);background:#fff;outline:none;width:100%}
+.input:focus,.select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+.input.error{border-color:var(--danger)}
+.hint{font-size:12px;color:var(--text-2);margin-top:6px}
+.hint.err{color:var(--danger)}
+.select{appearance:none;padding-right:36px;cursor:pointer}
+.select-wrap{position:relative}
+.select-wrap svg{position:absolute;right:12px;top:14px;pointer-events:none}
+.search{position:relative}
+.search svg{position:absolute;left:12px;top:12px}
+.search .input{padding-left:40px}
+.upload{border:1px dashed var(--border);border-radius:var(--r);background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;padding:16px}
+.upload:hover{border-color:var(--primary);background:var(--blue-bg)}
+
+/* ---------- Table ---------- */
+th{text-align:left;font-size:14px;font-weight:500;color:var(--text-2);padding:12px 24px;border-bottom:1px solid var(--border);background:#fff}
+td{height:52px;padding:0 24px;border-bottom:1px solid var(--divider);font-size:14px}
+tbody tr:hover{background:var(--hover)}
+.right{text-align:right}
+.bold{font-weight:600}
+.scroll-y{max-height:460px;overflow-y:auto}
+.scroll-y th{position:sticky;top:0;z-index:1}
+.scroll-x{overflow-x:auto}
+.table-foot{padding:16px 24px;font-size:13px;color:var(--text-2)}
+.toolbar{display:flex;align-items:center;gap:12px;padding:16px 24px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+
+/* ---------- Chips ---------- */
+.chip{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:999px;
+  font-size:12px;font-weight:500;white-space:nowrap}
+.chip-green{background:var(--green-bg);color:var(--green-fg)}
+.chip-red{background:var(--red-bg);color:var(--red-fg)}
+.chip-amber{background:var(--amber-bg);color:var(--amber-fg)}
+.chip-blue{background:var(--blue-bg);color:var(--blue-fg)}
+.chip-grey{background:var(--grey-bg);color:var(--grey-fg)}
+.chip-sm{height:20px;padding:0 8px;font-size:11px}
+
+/* ---------- Filter chips (Perlu Perhatian) ---------- */
+.fchip{display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 12px;border-radius:var(--r-sm);
+  background:#fff;font-size:13px;font-weight:500;cursor:pointer}
+.fchip .count{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;
+  padding:0 6px;border-radius:999px;font-size:12px;font-weight:600}
+.fchip.red{border:1px solid var(--red-br);color:var(--red-fg)}
+.fchip.red .count{background:var(--red-bg);color:var(--red-fg)}
+.fchip.red.on{background:var(--red-bg);border-color:var(--red-fg);font-weight:600}
+.fchip.amber{border:1px solid var(--amber-br);color:var(--amber-fg)}
+.fchip.amber .count{background:var(--amber-bg);color:var(--amber-fg)}
+.fchip.amber.on{background:var(--amber-bg);border-color:var(--amber-fg);font-weight:600}
+
+/* ---------- Tabs ---------- */
+.tabs-pill{display:inline-flex;padding:4px;background:var(--divider);border-radius:var(--r);margin-bottom:24px}
+.tab-pill{height:36px;padding:0 16px;border:none;border-radius:var(--r-sm);background:transparent;
+  color:var(--text-2);font-size:14px;font-weight:500;cursor:pointer}
+.tab-pill.on{background:#fff;color:var(--text);font-weight:600;box-shadow:0 1px 2px rgba(17,24,39,.08)}
+.tabs-line{display:flex;gap:24px;border-bottom:1px solid var(--border);margin-bottom:24px}
+.tab-line{height:44px;padding:0 2px;margin-bottom:-1px;border:none;background:transparent;
+  border-bottom:2px solid transparent;font-size:14px;font-weight:500;color:var(--text-2);cursor:pointer}
+.tab-line.on{color:var(--primary);font-weight:600;border-bottom-color:var(--primary)}
+
+/* ---------- Placeholders (replace with real images) ---------- */
+.photo{border:1px solid var(--border);border-radius:var(--r-sm);
+  background:repeating-linear-gradient(45deg,#F8FAFC 0 5px,#EEF2F7 5px 10px)}
+.barcode{background:repeating-linear-gradient(90deg,#111827 0 2px,transparent 2px 4px,#111827 4px 5px,
+  transparent 5px 8px,#111827 8px 10px,transparent 10px 13px)}
+
+/* ---------- Stats ---------- */
+.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:24px;margin-bottom:24px}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px}
+.stat-label{font-size:13px;font-weight:500;color:var(--text-2);line-height:1.3;height:34px}
+.stat-value{font-size:30px;font-weight:700;letter-spacing:-.02em;margin-top:6px}
+/* Tinted stat cards. The tone carries the meaning: blue = a plain count,
+   green = stock coming in, red = stock going out, amber = needs attention. */
+.stat.blue {background:var(--blue-bg); border-color:var(--blue-br)}
+.stat.green{background:var(--green-bg);border-color:var(--green-br)}
+.stat.red  {background:var(--red-bg);  border-color:var(--red-br)}
+.stat.amber{background:var(--amber-bg);border-color:var(--amber-br)}
+.stat.blue  .stat-label{color:var(--blue-fg)}
+.stat.green .stat-label{color:var(--green-fg)}
+.stat.red   .stat-label{color:var(--red-fg)}
+.stat.amber .stat-label{color:var(--amber-fg)}
+.stat.blue  .stat-value{color:var(--primary)}
+.stat.green .stat-value{color:var(--green-fg)}
+.stat.red   .stat-value{color:var(--red-fg)}
+.stat.amber .stat-value{color:var(--amber-fg)}
+
+/* ---------- Empty & loading ---------- */
+.empty{padding:80px 24px;display:flex;flex-direction:column;align-items:center;text-align:center}
+.empty h3{margin:20px 0 0;font-size:18px;font-weight:600}
+.empty p{margin:8px 0 0;font-size:14px;color:var(--text-2);max-width:360px}
+@keyframes sk{0%,100%{opacity:.5}50%{opacity:1}}
+.sk{background:var(--divider);border-radius:6px;animation:sk 1.4s ease-in-out infinite}
+
+/* ---------- Modal ---------- */
+.overlay{position:fixed;inset:0;background:rgba(17,24,39,.45);display:flex;align-items:center;justify-content:center;z-index:50}
+@keyframes modalIn{from{opacity:0;transform:translateY(8px) scale(.99)}to{opacity:1;transform:none}}
+.modal{background:#fff;border-radius:var(--r-lg);box-shadow:0 20px 50px rgba(17,24,39,.2);
+  animation:modalIn .16s ease-out;width:600px;max-height:90vh;overflow-y:auto}
+.modal.sm{width:460px}
+.modal.preview{width:440px}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border)}
+.modal-body{padding:24px}
+.modal-foot{display:flex;justify-content:flex-end;gap:12px;padding:20px 24px;border-top:1px solid var(--border)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.span2{grid-column:1/-1}
+
+/* SKU prefix input */
+.sku-input{display:flex;align-items:stretch;height:44px;border:1px solid var(--border);
+  border-radius:var(--r);overflow:hidden;background:#fff}
+.sku-prefix{display:flex;align-items:center;padding:0 14px;background:var(--bg);
+  border-right:1px solid var(--border);font:600 14px var(--mono);color:var(--text-2);white-space:nowrap}
+.sku-input input{flex:1;min-width:0;border:none;padding:0 14px;font:14px var(--mono);outline:none;background:transparent}
+
+/* ---------- Toast ---------- */
+@keyframes toastIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.toast{position:fixed;right:32px;bottom:28px;z-index:60;display:flex;align-items:center;gap:12px;
+  background:#fff;border:1px solid var(--border);border-radius:var(--r);
+  box-shadow:0 8px 24px rgba(17,24,39,.12);padding:14px 14px 14px 16px;min-width:320px;animation:toastIn .18s ease-out}
+.toast-icon{width:24px;height:24px;border-radius:999px;background:var(--success);
+  display:flex;align-items:center;justify-content:center;flex:none}
+
+/* ---------- Two-panel picker (Stock In / Out / Audit) ---------- */
+.panels{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+.panel{height:631px;display:flex;flex-direction:column}   /* head + toolbar + 6 rows */
+.panel-list{flex:1;min-height:0;overflow-y:auto}
+.picker-row{display:flex;align-items:center;gap:14px;padding:16px 24px;
+  border:none;border-bottom:1px solid var(--divider);
+  cursor:pointer;background:#fff;width:100%;text-align:left;font:inherit;color:inherit;
+  appearance:none;-webkit-appearance:none;border-radius:0}
+.picker-row:hover{background:var(--hover)}
+.picker-row.on{background:var(--blue-bg)}
+.picker-row .stack span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pick-check{width:24px;height:24px;flex:none;border-radius:999px;background:var(--primary);
+  display:flex;align-items:center;justify-content:center}
+/* right-hand selection list */
+.sel-row{display:flex;align-items:center;gap:14px;padding:16px 24px;border-bottom:1px solid var(--divider)}
+.sel-row .stack{flex:1;min-width:0}
+.sel-row .stack span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sel-controls{display:flex;align-items:center;gap:8px;flex:none}
+.qty-btn{width:44px;height:44px;padding:0;justify-content:center;font-size:18px;flex:none}
+.qty-input{width:88px;height:44px;text-align:center;font-size:16px;font-weight:600;flex:none}
+.diff-box{width:88px;height:44px;flex:none;border:1px solid;border-radius:var(--r);
+  display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600}
+.empty-sel{flex:1;display:flex;align-items:center;justify-content:center;
+  padding:24px;font-size:14px;color:var(--text-2);text-align:center}
+/* scan button inset in the picker search field */
+.search .scan-btn{position:absolute;right:6px;top:6px;width:32px;height:32px;padding:0;
+  border:1px solid var(--border);border-radius:var(--r-sm);background:var(--blue-bg);
+  color:var(--primary);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.search .scan-btn:hover{border-color:var(--blue-br)}
+.search .scan-btn svg{position:static}
+.search .input.with-scan{padding-right:48px}
+.dropdown{position:absolute;top:66px;right:32px;background:#fff;border:1px solid var(--border);
+  border-radius:var(--r);box-shadow:0 8px 24px rgba(17,24,39,.10);padding:6px;z-index:40;width:236px}
+.menu-item{width:100%;display:flex;align-items:center;gap:10px;height:38px;padding:0 12px;
+  border:none;background:transparent;border-radius:var(--r-sm);font-size:14px;color:var(--grey-fg);
+  cursor:pointer;text-align:left}
+.menu-item:hover{background:var(--hover)}
+.menu-item.danger{color:var(--danger)}
+.menu-item.danger:hover{background:var(--red-bg)}
+.stack{display:flex;flex-direction:column;gap:2px}
+.row{display:flex;align-items:center;gap:12px}
+.spacer{flex:1}
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+
+<script>
+/* ============================================================================
+   KANONA — CLICKABLE PROTOTYPE
+   ----------------------------------------------------------------------------
+   Every screen below runs on the dummy data in DATA, held in memory only:
+   reload the page and it is back to the seed. Recording stock really does
+   change the numbers, write a history row and move the dashboard, so the
+   whole flow can be walked end to end before any backend exists.
+
+   What this prototype deliberately does NOT do — these belong to the server,
+   see README.md:
+     · the expected_stock check (two people counting the same shelf)
+     · Row Level Security — here the role only hides things on screen
+     · marketplace sync — the orders below are fixed sample rows, and
+       Hubungkan Ulang stays inert until the channel APIs are connected
+     · real barcode images and print CSS (bwip-js, week 3)
+
+   In production every array in DATA becomes a query:
+     DATA.products / DATA.variants  → products, variants
+     DATA.movements                 → stock_movements (append only)
+     DATA.orders / DATA.channels    → marketplace_orders, _connections
+     DATA.users / DATA.categories   → profiles, categories
+   ============================================================================ */
+
+/* The prototype's "today". Seed rows are dated against it and new rows get it
+   too, so "hari ini" on the dashboard means something. Production uses now(). */
+const TODAY = '2026-08-25';
+
+const DATA = {
+  me: { name:'Andini Prameswari', email:'andini@kanona.id' },
+
+  categories: ['Kemeja','Kaos','Celana','Dress','Outerwear','Rok'],
+
+  products: [
+    { name:'Kemeja Oxford Lengan Panjang', sku:'KMJ-OXF', category:'Kemeja',    threshold:10 },
+    { name:'Kaos Katun Combed 30s',        sku:'KAO-CMB', category:'Kaos',      threshold:15 },
+    { name:'Celana Chino Slim Fit',        sku:'CLN-CHN', category:'Celana',    threshold:10 },
+    { name:'Dress Midi Linen',             sku:'DRS-MDL', category:'Dress',     threshold:8  },
+    { name:'Blazer Formal Wanita',         sku:'BLZ-FRM', category:'Outerwear', threshold:6  },
+    { name:'Hoodie Fleece Oversize',       sku:'HDE-FLC', category:'Outerwear', threshold:10 },
+    { name:'Rok Plisket Midi',             sku:'ROK-PLS', category:'Rok',       threshold:8  },
+    { name:'Jaket Denim Washed',           sku:'JKT-DNM', category:'Outerwear', threshold:6  },
+  ],
+
+  /* Stock lives here and nowhere else — product totals are added up from it. */
+  variants: [
+    { sku:'KMJ-OXF-NVY-S',   parent:'KMJ-OXF', color:'Navy',  size:'S',   price:189000, stock:48,  active:true  },
+    { sku:'KMJ-OXF-NVY-M',   parent:'KMJ-OXF', color:'Navy',  size:'M',   price:189000, stock:96,  active:true  },
+    { sku:'KMJ-OXF-NVY-L',   parent:'KMJ-OXF', color:'Navy',  size:'L',   price:189000, stock:42,  active:true  },
+    { sku:'KMJ-OXF-NVY-XL',  parent:'KMJ-OXF', color:'Navy',  size:'XL',  price:199000, stock:31,  active:false },
+    { sku:'KMJ-OXF-PTH-M',   parent:'KMJ-OXF', color:'Putih', size:'M',   price:189000, stock:87,  active:true  },
+    { sku:'KMJ-OXF-PTH-XL',  parent:'KMJ-OXF', color:'Putih', size:'XL',  price:199000, stock:9,   active:true  },
+    { sku:'KAO-CMB-HTM-M',   parent:'KAO-CMB', color:'Hitam', size:'M',   price:89000,  stock:186, active:true  },
+    { sku:'KAO-CMB-HTM-L',   parent:'KAO-CMB', color:'Hitam', size:'L',   price:89000,  stock:124, active:true  },
+    { sku:'KAO-CMB-PTH-L',   parent:'KAO-CMB', color:'Putih', size:'L',   price:89000,  stock:198, active:true  },
+    { sku:'KAO-CMB-PTH-XL',  parent:'KAO-CMB', color:'Putih', size:'XL',  price:99000,  stock:10,  active:true  },
+    { sku:'KAO-CMB-NVY-XXL', parent:'KAO-CMB', color:'Navy',  size:'XXL', price:99000,  stock:0,   active:true  },
+    { sku:'CLN-CHN-KRM-30',  parent:'CLN-CHN', color:'Krem',  size:'30',  price:249000, stock:4,   active:true  },
+    { sku:'CLN-CHN-KRM-32',  parent:'CLN-CHN', color:'Krem',  size:'32',  price:249000, stock:64,  active:true  },
+    { sku:'CLN-CHN-HTM-34',  parent:'CLN-CHN', color:'Hitam', size:'34',  price:249000, stock:51,  active:true  },
+    { sku:'DRS-MDL-CRM-S',   parent:'DRS-MDL', color:'Krem',  size:'S',   price:279000, stock:0,   active:true  },
+    { sku:'DRS-MDL-CRM-M',   parent:'DRS-MDL', color:'Krem',  size:'M',   price:279000, stock:33,  active:true  },
+    { sku:'BLZ-FRM-HTM-S',   parent:'BLZ-FRM', color:'Hitam', size:'S',   price:349000, stock:0,   active:true  },
+    { sku:'BLZ-FRM-HTM-M',   parent:'BLZ-FRM', color:'Hitam', size:'M',   price:349000, stock:42,  active:true  },
+    { sku:'HDE-FLC-ABU-L',   parent:'HDE-FLC', color:'Abu',   size:'L',   price:229000, stock:6,   active:true  },
+    { sku:'HDE-FLC-ABU-XL',  parent:'HDE-FLC', color:'Abu',   size:'XL',  price:229000, stock:48,  active:true  },
+    { sku:'ROK-PLS-HTM-S',   parent:'ROK-PLS', color:'Hitam', size:'S',   price:159000, stock:73,  active:true  },
+    { sku:'ROK-PLS-HTM-M',   parent:'ROK-PLS', color:'Hitam', size:'M',   price:159000, stock:2,   active:true  },
+    { sku:'JKT-DNM-BLU-M',   parent:'JKT-DNM', color:'Biru',  size:'M',   price:329000, stock:9,   active:true  },
+    { sku:'JKT-DNM-BLU-L',   parent:'JKT-DNM', color:'Biru',  size:'L',   price:329000, stock:12,  active:true  },
+    { sku:'JKT-DNM-BLU-XL',  parent:'JKT-DNM', color:'Biru',  size:'XL',  price:329000, stock:0,   active:true  },
+  ],
+
+  /* Append only, newest first. Each row's `after` is the stock the variant had
+     when the row was written, so the newest row per SKU matches DATA.variants. */
+  movements: [
+    { date:'2026-08-25', time:'09:42', sku:'KMJ-OXF-NVY-L',  before:22,  change:20,  after:42,  activity:'Stok Masuk',  source:'Manual',      user:'Andini Prameswari' },
+    { date:'2026-08-25', time:'09:31', sku:'KAO-CMB-HTM-M',  before:189, change:-3,  after:186, activity:'Stok Keluar', source:'Shopee',      user:'Sistem'            },
+    { date:'2026-08-25', time:'09:18', sku:'CLN-CHN-KRM-32', before:66,  change:-2,  after:64,  activity:'Penyesuaian', source:'Audit Stok',  user:'Bagas Nugroho'     },
+    { date:'2026-08-25', time:'09:05', sku:'DRS-MDL-CRM-M',  before:34,  change:-1,  after:33,  activity:'Stok Keluar', source:'TikTok Shop', user:'Sistem'            },
+    { date:'2026-08-25', time:'08:57', sku:'HDE-FLC-ABU-XL', before:52,  change:-4,  after:48,  activity:'Stok Keluar', source:'Tokopedia',   user:'Sistem'            },
+    { date:'2026-08-25', time:'08:44', sku:'ROK-PLS-HTM-S',  before:13,  change:60,  after:73,  activity:'Stok Masuk',  source:'Manual',      user:'Andini Prameswari' },
+    { date:'2026-08-24', time:'17:20', sku:'JKT-DNM-BLU-L',  before:14,  change:-2,  after:12,  activity:'Stok Keluar', source:'Shopee',      user:'Sistem'            },
+    { date:'2026-08-24', time:'16:02', sku:'BLZ-FRM-HTM-M',  before:18,  change:24,  after:42,  activity:'Stok Masuk',  source:'Manual',      user:'Bagas Nugroho'     },
+  ],
+
+  /* Fixed sample rows — nothing pulls these in until the channel APIs exist. */
+  orders: [
+    { invoice:'INV/2608/AB19', channel:'Shopee',      sku:'KAO-CMB-HTM-M',  qty:3, status:'Diproses'   },
+    { invoice:'INV/2608/AB18', channel:'Tokopedia',   sku:'HDE-FLC-ABU-XL', qty:4, status:'Dikirim'    },
+    { invoice:'INV/2608/AB17', channel:'TikTok Shop', sku:'DRS-MDL-CRM-M',  qty:1, status:'Diproses'   },
+    { invoice:'INV/2608/AB15', channel:'Shopee',      sku:'JKT-DNM-BLU-L',  qty:2, status:'Dikirim'    },
+    { invoice:'INV/2608/AB14', channel:'Shopee',      sku:'KMJ-OXF-NVY-M',  qty:5, status:'Dibatalkan' },
+    { invoice:'INV/2608/AB12', channel:'Tokopedia',   sku:'CLN-CHN-KRM-32', qty:2, status:'Dikirim'    },
+    { invoice:'INV/2608/AB11', channel:'TikTok Shop', sku:'ROK-PLS-HTM-S',  qty:1, status:'Menunggu'   },
+  ],
+
+  channels: [
+    { name:'Shopee',      initials:'SH', shop:'Kanona Official Store', connected:true,  sync:'2 menit lalu'  },
+    { name:'Tokopedia',   initials:'TP', shop:'Kanona Fashion',        connected:true,  sync:'11 menit lalu' },
+    { name:'TikTok Shop', initials:'TT', shop:'Belum tersambung',      connected:false, sync:'3 hari lalu'   },
+  ],
+
+  users: [
+    { name:'Andini Prameswari', email:'andini@kanona.id', role:'Owner',   active:true  },
+    { name:'Bagas Nugroho',     email:'bagas@kanona.id',  role:'Manager', active:true  },
+    { name:'Citra Salsabila',   email:'citra@kanona.id',  role:'Admin',   active:true  },
+    { name:'Dimas Rahardian',   email:'dimas@kanona.id',  role:'Manager', active:false },
+    { name:'Elsa Wulandari',    email:'elsa@kanona.id',   role:'Admin',   active:true  },
+  ],
+};
+
+/* ============================================================================
+   PERMISSIONS — in production this lives in lib/permissions.ts
+   Components ask about a CAPABILITY, never about a job title.
+   ============================================================================ */
+const PERMISSIONS = {
+  manageProducts:   ['Owner'],
+  manageUsers:      ['Owner'],
+  reconnectChannel: ['Owner'],
+  manualStockOut:   ['Owner','Manager'],
+  stockIn:          ['Owner','Manager','Admin'],
+  stockAudit:       ['Owner','Manager','Admin'],
+  printBarcode:     ['Owner','Manager','Admin'],
+  manageCategories: ['Owner','Manager','Admin'],
+};
+const can = (action) => (PERMISSIONS[action] || []).includes(state.role);
+
+/* ============================================================================
+   UI STATE — in React this becomes useState / useContext
+   ============================================================================ */
+const state = {
+  authed: true,
+  page: 'dashboard',
+  role: 'Owner',
+  profileOpen: false,
+  attentionFilter: 'habis',
+  stockOutTab: 'marketplace',
+  settingsTab: 'pengguna',
+  detailSku: 'KMJ-OXF',            // which product Detail Produk is showing
+
+  /* The three stock screens each hold a list of picked variants — the left
+     panel ticks them, the right panel is where the number is typed. Quantities
+     are kept as text so the field can be cleared while typing. */
+  inRows:    [ { sku:'KMJ-OXF-NVY-L', qty:'120' }, { sku:'ROK-PLS-HTM-S', qty:'60' } ],
+  outRows:   [ { sku:'KAO-CMB-HTM-M', qty:'12' } ],
+  auditRows: [ { sku:'CLN-CHN-KRM-32', physical:'61' } ],
+  pick: { in:{q:'',cat:''}, out:{q:'',cat:''}, audit:{q:'',cat:''} },
+
+  produk:  { q:'', cat:'', sort:'Urutkan: Terbaru' },
+  orderF:  { q:'', channel:'' },
+  history: { from:'2026-08-19', to:'2026-08-25', activity:'', source:'', user:'', q:'' },
+  userQ:   '',
+
+  barcode: { q:'', cat:'', open:{ 'KMJ-OXF':true }, sel:{ 'KMJ-OXF-NVY-L':10, 'KMJ-OXF-NVY-M':2 } },
+  labelParts: { nama:true, varian:true, sku:true, harga:false },
+  paper: { size:'50 × 30 mm', perRow:'3 label', start:'1' },
+
+  modal: null,        // 'product' | 'variant' | 'preview' | 'confirm' | 'user' | 'category' | 'password'
+  modalMode: 'add',   // 'add' | 'edit'
+  form: {},           // the dialog's working copy
+  formErr: {},
+  editing: null,      // the row being edited
+  confirm: null,      // { title, body, label, danger, onOk }
+  toast: null,
+};
+
+const MENU = [
+  { id:'dashboard',   label:'Dashboard',    icon:'grid'      },
+  { id:'produk',      label:'Produk',       icon:'box'       },
+  { id:'stok-masuk',  label:'Stok Masuk',   icon:'in'        },
+  { id:'stok-keluar', label:'Stok Keluar',  icon:'out'       },
+  { id:'audit',       label:'Audit Stok',   icon:'clipboard' },
+  { id:'riwayat',     label:'Riwayat Stok', icon:'clock'     },
+  { id:'barcode',     label:'Barcode',      icon:'barcode'   },
+  { id:'marketplace', label:'Marketplace',  icon:'store'     },
+  { id:'pengaturan',  label:'Pengaturan',   icon:'sliders'   },
+];
+
+/* Lucide-style icons. In production: import from lucide-react. */
+const ICONS = {
+  grid:'<rect x="3" y="3" width="7" height="8" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="11" width="7" height="10" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/>',
+  box:'<path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5z"/><path d="M3 7.5 12 12l9-4.5"/><path d="M12 12v9"/>',
+  in:'<path d="M12 3v11"/><path d="m7 9 5 5 5-5"/><path d="M5 20h14"/>',
+  out:'<path d="M12 21V10"/><path d="m7 15 5-5 5 5"/><path d="M5 4h14"/>',
+  clipboard:'<rect x="8" y="2" width="8" height="4" rx="1.2"/><path d="M16 4h2a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 13.5 2 2 4-4"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>',
+  barcode:'<path d="M3 5v14"/><path d="M7 5v14"/><path d="M11 5v10"/><path d="M15 5v14"/><path d="M19 5v10"/>',
+  store:'<path d="M3.5 9h17l-1.4-5H4.9z"/><path d="M4.5 9v10a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1V9"/><path d="M9.5 20v-6h5v6"/>',
+  sliders:'<line x1="3" y1="7" x2="21" y2="7"/><circle cx="9" cy="7" r="2.4"/><line x1="3" y1="17" x2="21" y2="17"/><circle cx="15" cy="17" r="2.4"/>',
+  search:'<circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/>',
+  chevronDown:'<path d="m6 9 6 6 6-6"/>',
+  chevronLeft:'<path d="m14 6-6 6 6 6"/>',
+  chevronRight:'<path d="m9 6 6 6-6 6"/>',
+  plus:'<path d="M12 5v14"/><path d="M5 12h14"/>',
+  pencil:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+  trash:'<path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6v14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V6"/>',
+  lock:'<rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>',
+  refresh:'<path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/>',
+  download:'<path d="M12 3v12"/><path d="m7 11 5 4 5-4"/><path d="M5 21h14"/>',
+  print:'<path d="M6 9V3h12v6"/><rect x="6" y="14" width="12" height="7"/><path d="M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/>',
+  save:'<path d="M15.2 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.8a2 2 0 0 0-.6-1.4l-3.8-3.8a2 2 0 0 0-1.4-.6Z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h7"/>',
+  scan:'<path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M4 12h16"/>',
+  warning:'<path d="M12 9v4"/><path d="M10.3 3.9 2.6 17a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 17h.01"/>',
+  close:'<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+  check:'<path d="m5 12 5 5L20 7"/>',
+  user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+  logout:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/>',
+  upload:'<path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 20h16"/>',
+  info:'<circle cx="12" cy="12" r="9"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
+};
+const icon = (n, size=20, color='currentColor', sw=1.7) =>
+  `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color}"
+    stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">${ICONS[n]||''}</svg>`;
+
+/* ============================================================================
+   FORMATTING
+   ============================================================================ */
+const MONTHS = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+const num     = (n) => n.toLocaleString('id-ID');
+const rupiah  = (n) => 'Rp ' + num(n);
+const fmtDate = (iso) => { const [y,m,d] = iso.split('-'); return `${+d} ${MONTHS[+m-1]} ${y}`; };
+const signed  = (n) => (n > 0 ? '+' : n < 0 ? '−' : '') + Math.abs(n);
+const clock   = () => { const d = new Date(); return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; };
+const esc     = (s) => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+const initials= (name) => name.split(' ').slice(0,2).map(w => w[0]).join('').toUpperCase();
+const digits  = (s) => String(s).replace(/[^0-9]/g,'');
+
+/* ---------- small view helpers ---------- */
+const activityChip = (a) => a === 'Stok Masuk' ? 'chip-green'
+  : a === 'Stok Keluar' ? 'chip-red' : 'chip-amber';
+const qtyColor = (n) => n > 0 ? 'var(--green-fg)' : n < 0 ? 'var(--red-fg)' : 'var(--text)';
+const orderChip = (s) => ({ 'Diproses':'chip-blue','Dikirim':'chip-green',
+  'Dibatalkan':'chip-red','Menunggu':'chip-grey' })[s] || 'chip-grey';
+
+/* Every field that re-renders on input needs a stable data-fid so the caret
+   can be put back afterwards — see render(). */
+const selectBox = (opts, value, onChange, w='') =>
+  `<div class="select-wrap" ${w?`style="width:${w}"`:''}>
+     <select class="select" data-fid="${onChange ? 'sel-'+opts[0] : ''}"
+       ${onChange?`onchange="${onChange}"`:''}>
+       ${opts.map(o => `<option ${o===value?'selected':''}>${o}</option>`).join('')}
+     </select>
+     ${icon('chevronDown',16,'#6B7280',1.9)}
+   </div>`;
+const photoBox = (size, label) =>
+  `<div class="photo" style="width:${size}px;height:${size}px;display:flex;align-items:flex-end;
+    justify-content:center;padding-bottom:6px">
+     ${label?`<span style="font:10px var(--mono);color:#94A3B8">${label}</span>`:''}
+   </div>`;
+const barcodeBox = (w,h) => `<div class="barcode" style="width:${w}px;height:${h}px"></div>`;
+const emptyState = (title, text) => `
+  <div class="empty">
+    ${icon('search',40,'#CBD5E1',1.4)}
+    <h3>${title}</h3>
+    <p>${text}</p>
+  </div>`;
+const checkbox = (checked, onChange, extra='') =>
+  `<input type="checkbox" ${checked?'checked':''} ${extra}
+    style="width:16px;height:16px;margin:0;accent-color:var(--primary);flex:none;cursor:pointer"
+    onclick="event.stopPropagation()" onchange="${onChange}">`;
+
+/* ============================================================================
+   SELECTORS — everything on screen is derived from DATA, never stored twice
+   ============================================================================ */
+const productOf  = (parent) => DATA.products.find(p => p.sku === parent);
+const variantOf  = (sku)    => DATA.variants.find(v => v.sku === sku);
+const nameOf     = (sku)    => { const v = variantOf(sku); return v ? productOf(v.parent).name : sku; };
+const variantsOf = (parent) => DATA.variants.filter(v => v.parent === parent);
+const labelOf    = (v)      => `${v.color} · ${v.size}`;
+
+/* A product row for the Produk table: counts and totals added up from variants */
+function productRows(){
+  return DATA.products.map(p => {
+    const vs = variantsOf(p.sku);
+    return { ...p, variants: vs.length, stock: vs.reduce((s,v) => s + v.stock, 0),
+             firstSku: vs.length ? vs[0].sku : '—' };
+  });
+}
+
+/* Habis = 0. Menipis = at or below the product's own threshold. */
+function attention(){
+  const habis = [], menipis = [];
+  DATA.variants.forEach(v => {
+    const p = productOf(v.parent);
+    const row = { sku:v.sku, variant:`${p.name} · ${labelOf(v)}`, left:v.stock };
+    if (v.stock === 0) habis.push(row);
+    else if (v.stock <= p.threshold) menipis.push(row);
+  });
+  menipis.sort((a,b) => a.left - b.left);
+  return { habis, menipis };
+}
+
+function stats(){
+  const today = DATA.movements.filter(m => m.date === TODAY);
+  const sum = (f) => today.filter(f).reduce((s,m) => s + Math.abs(m.change), 0);
+  const a = attention();
+  return [
+    { label:'Total Produk',         value:num(DATA.products.length),  tone:'blue'  },
+    { label:'Total Varian',         value:num(DATA.variants.length),  tone:'blue'  },
+    { label:'Total Stok',           value:num(DATA.variants.reduce((s,v) => s + v.stock, 0)), tone:'blue' },
+    { label:'Stok Masuk Hari Ini',  value:num(sum(m => m.change > 0)), tone:'green' },
+    { label:'Stok Keluar Hari Ini', value:num(sum(m => m.change < 0)), tone:'red'   },
+    { label:'Stok Menipis',         value:num(a.menipis.length),      tone:'amber' },
+  ];
+}
+
+/* The five Riwayat Stok filters, applied in one place. In production this is
+   the WHERE clause — the filtering happens in SQL, not in the browser. */
+function historyRows(){
+  const f = state.history;
+  const q = f.q.trim().toLowerCase();
+  return DATA.movements.filter(m => {
+    if (f.from && m.date < f.from) return false;
+    if (f.to   && m.date > f.to)   return false;
+    if (f.activity && m.activity !== f.activity) return false;
+    if (f.source   && m.source   !== f.source)   return false;
+    if (f.user     && m.user     !== f.user)     return false;
+    if (q && !(m.sku.toLowerCase().includes(q) || nameOf(m.sku).toLowerCase().includes(q))) return false;
+    return true;
+  });
+}
+
+/* ============================================================================
+   ACTIONS
+   ============================================================================ */
+function toast(msg){ state.toast = msg; render(); clearTimeout(toast.t); toast.t = setTimeout(()=>{ state.toast=null; render(); }, 3400); }
+function go(page, arg){
+  state.page = page;
+  state.profileOpen = false;
+  if (page === 'detail' && arg) state.detailSku = arg;
+  render();
+}
+
+/* The one path every stock change takes. On the server this is
+   record_stock_movement: one transaction, the history row and the new stock
+   written together, and the expected_stock check before either. */
+function recordMovement({ sku, change, activity, source, user }){
+  const v = variantOf(sku);
+  const before = v.stock;
+  const after = before + change;
+  v.stock = after;
+  DATA.movements.unshift({ date:TODAY, time:clock(), sku, before, change, after, activity, source, user });
+}
+
+/* ---------- picked-variant helpers (Stok Masuk / Stok Keluar / Audit Stok) ----
+   `kind` is 'in' | 'out' | 'audit' and chooses which list in state is edited. */
+const ROWS = { in:'inRows', out:'outRows', audit:'auditRows' };
+const rowsOf    = (kind) => state[ROWS[kind]];
+const pickedRow = (kind, sku) => rowsOf(kind).find(r => r.sku === sku);
+const qtyNum    = (r) => +r.qty || 0;
+
+function togglePick(kind, sku){
+  const rows = rowsOf(kind);
+  const i = rows.findIndex(r => r.sku === sku);
+  if (i > -1) rows.splice(i, 1);
+  else rows.push(kind === 'audit' ? { sku, physical:String(variantOf(sku).stock) } : { sku, qty:'1' });
+  render();
+}
+function setRow(kind, sku, field, value){ pickedRow(kind, sku)[field] = digits(value); render(); }
+function bumpQty(kind, sku, by){
+  const r = pickedRow(kind, sku);
+  r.qty = String(Math.max(0, qtyNum(r) + by));
+  render();
+}
+function removePick(kind, sku){ togglePick(kind, sku); }
+function clearPicks(kind){
+  if (!rowsOf(kind).length) return;
+  state[ROWS[kind]] = [];
+  toast('Pilihan dibatalkan');
+}
+
+/* A USB scanner types the SKU and presses Enter. Typing it by hand does the
+   same thing, which is the point of putting the SKU inside the barcode. */
+function pickerKey(kind, e, value){
+  if (e.key !== 'Enter') return;
+  const code = value.trim().toUpperCase();
+  const v = DATA.variants.find(x => x.sku === code) ||
+            (pickerList(kind).length === 1 ? pickerList(kind)[0] : null);
+  if (!v)                          return toast('SKU tidak ditemukan: ' + (code || '(kosong)'));
+  if (kind !== 'audit' && !v.active) return toast(v.sku + ' nonaktif, tidak bisa dipilih di sini.');
+  if (pickedRow(kind, v.sku))      return toast(v.sku + ' sudah ada di daftar.');
+  state.pick[kind].q = '';
+  togglePick(kind, v.sku);
+  toast(v.sku + ' ditambahkan');
+}
+
+function saveStockIn(){
+  const rows = state.inRows.filter(r => qtyNum(r) > 0);
+  if (!rows.length) return toast('Isi jumlah lebih besar dari 0 dulu.');
+  rows.forEach(r => recordMovement({ sku:r.sku, change:qtyNum(r),
+    activity:'Stok Masuk', source:'Manual', user:DATA.me.name }));
+  state.inRows = [];
+  toast(`Stok masuk tersimpan untuk ${rows.length} varian`);
+}
+
+function saveStockOut(){
+  const rows = state.outRows.filter(r => qtyNum(r) > 0);
+  if (!rows.length) return toast('Isi jumlah lebih besar dari 0 dulu.');
+  const over = rows.find(r => qtyNum(r) > variantOf(r.sku).stock);
+  if (over) return toast(`${over.sku} hanya punya ${variantOf(over.sku).stock} stok. Tidak ada yang disimpan.`);
+  rows.forEach(r => recordMovement({ sku:r.sku, change:-qtyNum(r),
+    activity:'Stok Keluar', source:'Manual', user:DATA.me.name }));
+  state.outRows = [];
+  toast(`Stok keluar tersimpan untuk ${rows.length} varian`);
+}
+
+/* A zero difference writes no row at all — there is nothing to record. */
+function saveAudit(){
+  const rows = state.auditRows.map(r => ({ r, diff: (+r.physical || 0) - variantOf(r.sku).stock }));
+  const changed = rows.filter(x => x.diff !== 0);
+  if (!rows.length)    return toast('Pilih varian dulu.');
+  if (!changed.length) return toast('Tidak ada selisih — tidak ada yang perlu dicatat.');
+  changed.forEach(x => recordMovement({ sku:x.r.sku, change:x.diff,
+    activity:'Penyesuaian', source:'Audit Stok', user:DATA.me.name }));
+  state.auditRows = [];
+  toast(`Penyesuaian tersimpan untuk ${changed.length} varian`);
+}
+
+/* ---------- Riwayat Stok ---------- */
+function exportCsv(){
+  const rows = historyRows();
+  if (!rows.length) return toast('Tidak ada catatan untuk diekspor.');
+  const head = ['Tanggal','Waktu','SKU','Produk','Varian','Sebelum','Perubahan','Sesudah','Aktivitas','Sumber','Pengguna'];
+  const body = rows.map(m => {
+    const v = variantOf(m.sku);
+    return [fmtDate(m.date), m.time, m.sku, nameOf(m.sku), v ? labelOf(v) : '',
+            m.before, m.change, m.after, m.activity, m.source, m.user];
+  });
+  const csv = [head, ...body].map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\r\n');
+  const url = URL.createObjectURL(new Blob(['﻿' + csv], { type:'text/csv;charset=utf-8' }));
+  const a = Object.assign(document.createElement('a'), { href:url, download:`riwayat-stok-${TODAY}.csv` });
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  toast(`${rows.length} catatan diekspor ke CSV`);
+}
+function resetHistory(){
+  state.history = { from:'2026-08-19', to:'2026-08-25', activity:'', source:'', user:'', q:'' };
+  toast('Filter dikembalikan ke awal');
+}
+
+/* ---------- Barcode ---------- */
+const printTotal = () => Object.values(state.barcode.sel).reduce((s,n) => s + (+n || 0), 0);
+const printSkus  = () => Object.keys(state.barcode.sel);
+
+function barcodeGroups(){
+  const q = state.barcode.q.trim().toLowerCase();
+  const cat = state.barcode.cat;
+  return DATA.products
+    .filter(p => !cat || p.category === cat)
+    .map(p => ({ p, variants: variantsOf(p.sku).filter(v => v.active &&
+        (!q || v.sku.toLowerCase().includes(q) || p.name.toLowerCase().includes(q) ||
+         labelOf(v).toLowerCase().includes(q))) }))
+    .filter(g => g.variants.length);
+}
+function toggleLabel(sku, on){
+  if (on) state.barcode.sel[sku] = state.barcode.sel[sku] || 10;
+  else delete state.barcode.sel[sku];
+  render();
+}
+function setLabelQty(sku, value){
+  const n = +digits(value);
+  if (n > 0) state.barcode.sel[sku] = n; else state.barcode.sel[sku] = '';
+  render();
+}
+function toggleGroup(parent, on){
+  barcodeGroups().find(g => g.p.sku === parent).variants
+    .forEach(v => { if (on) state.barcode.sel[v.sku] = state.barcode.sel[v.sku] || 10;
+                    else delete state.barcode.sel[v.sku]; });
+  render();
+}
+function toggleAllLabels(on){
+  barcodeGroups().forEach(g => g.variants
+    .forEach(v => { if (on) state.barcode.sel[v.sku] = state.barcode.sel[v.sku] || 10;
+                    else delete state.barcode.sel[v.sku]; }));
+  render();
+}
+
+/* ---------- dialogs ---------- */
+function openModal(kind, mode='add', target=null){
+  state.modal = kind; state.modalMode = mode; state.editing = target; state.formErr = {};
+  const f = {};
+  if (kind === 'product') Object.assign(f, mode === 'edit'
+    ? { ...target }
+    : { name:'', sku:'', category:DATA.categories[0], threshold:'10' });
+  if (kind === 'variant') Object.assign(f, mode === 'edit'
+    ? { code: target.sku.slice(target.parent.length + 1), color:target.color, size:target.size,
+        price:String(target.price), active:target.active, parent:target.parent }
+    : { code:'', color:'', size:'M', price:'', active:true, parent:target.parent });
+  if (kind === 'user') Object.assign(f, mode === 'edit'
+    ? { ...target, password:'' }
+    : { name:'', email:'', role:'Manager', active:true, password:'' });
+  if (kind === 'category') Object.assign(f, { name: mode === 'edit' ? target : '' });
+  if (kind === 'password') Object.assign(f, { current:'', next:'', confirm:'' });
+  state.form = f;
+  render();
+}
+function closeModal(){ state.modal = null; state.editing = null; state.form = {}; state.formErr = {}; render(); }
+function setForm(field, value){ state.form[field] = value; delete state.formErr[field]; render(); }
+function askConfirm(c){ state.confirm = c; state.modal = 'confirm'; render(); }
+function confirmOk(){ const c = state.confirm; state.modal = null; state.confirm = null; c.onOk(); }
+
+function saveProduct(){
+  const f = state.form, err = {};
+  const sku = f.sku.trim().toUpperCase();
+  if (!f.name.trim()) err.name = 'Nama produk wajib diisi.';
+  if (!sku)           err.sku  = 'SKU induk wajib diisi.';
+  else if (DATA.products.some(p => p.sku === sku && p !== state.editing))
+    err.sku = 'SKU induk ini sudah dipakai produk lain.';
+  state.formErr = err;
+  if (Object.keys(err).length) return render();
+
+  if (state.modalMode === 'edit'){
+    const old = state.editing.sku;
+    Object.assign(state.editing, { name:f.name.trim(), sku, category:f.category, threshold:+f.threshold || 10 });
+    if (old !== sku) variantsOf(old).forEach(v => { v.parent = sku; v.sku = sku + v.sku.slice(old.length); });
+    if (state.detailSku === old) state.detailSku = sku;
+  } else {
+    DATA.products.push({ name:f.name.trim(), sku, category:f.category, threshold:+f.threshold || 10 });
+  }
+  closeModal();
+  toast(state.modalMode === 'edit' ? 'Produk berhasil diperbarui' : 'Produk berhasil dibuat');
+}
+
+function saveVariant(){
+  const f = state.form, err = {};
+  const code = f.code.trim().toUpperCase();
+  const full = f.parent + '-' + code;
+  if (!code)           err.code  = 'Kode varian wajib diisi.';
+  else if (DATA.variants.some(v => v.sku === full && v !== state.editing))
+    err.code = 'Kode varian ini sudah dipakai.';
+  if (!f.color.trim()) err.color = 'Warna wajib diisi.';
+  if (!+digits(f.price)) err.price = 'Harga tidak boleh kosong.';
+  state.formErr = err;
+  if (Object.keys(err).length) return render();
+
+  const row = { sku:full, parent:f.parent, color:f.color.trim(), size:f.size,
+                price:+digits(f.price), active:f.active };
+  if (state.modalMode === 'edit') Object.assign(state.editing, row);
+  else DATA.variants.push({ ...row, stock:0 });
+  closeModal();
+  toast('Varian berhasil disimpan');
+}
+
+function saveUser(){
+  const f = state.form, err = {};
+  if (!f.name.trim())  err.name  = 'Nama wajib diisi.';
+  if (!/^\S+@\S+\.\S+$/.test(f.email.trim())) err.email = 'Alamat email tidak valid.';
+  else if (DATA.users.some(u => u.email === f.email.trim() && u !== state.editing))
+    err.email = 'Email ini sudah dipakai.';
+  if (state.modalMode === 'add' && f.password.length < 8) err.password = 'Minimal 8 karakter.';
+  state.formErr = err;
+  if (Object.keys(err).length) return render();
+
+  const row = { name:f.name.trim(), email:f.email.trim(), role:f.role, active:f.active };
+  if (state.modalMode === 'edit') Object.assign(state.editing, row);
+  else DATA.users.push(row);
+  closeModal();
+  toast(state.modalMode === 'edit' ? 'Data pengguna diperbarui' : 'Akun karyawan berhasil dibuat');
+}
+
+function saveCategory(){
+  const name = state.form.name.trim();
+  if (!name) { state.formErr = { name:'Nama kategori wajib diisi.' }; return render(); }
+  if (DATA.categories.some(c => c.toLowerCase() === name.toLowerCase() && c !== state.editing)){
+    state.formErr = { name:'Kategori ini sudah ada.' }; return render();
+  }
+  if (state.modalMode === 'edit'){
+    DATA.products.forEach(p => { if (p.category === state.editing) p.category = name; });
+    DATA.categories[DATA.categories.indexOf(state.editing)] = name;
+  } else DATA.categories.push(name);
+  closeModal();
+  toast('Kategori berhasil disimpan');
+}
+
+function savePassword(){
+  const f = state.form, err = {};
+  if (state.editing.email === DATA.me.email && !f.current) err.current = 'Kata sandi saat ini wajib diisi.';
+  if (f.next.length < 8)     err.next    = 'Minimal 8 karakter.';
+  if (f.next !== f.confirm)  err.confirm = 'Konfirmasi tidak sama.';
+  state.formErr = err;
+  if (Object.keys(err).length) return render();
+  closeModal();
+  toast('Kata sandi berhasil diubah');
+}
+
+/* Products and variants can be removed. Users cannot — their name is still on
+   history rows, so leaving is is_active = false. */
+function deleteProduct(p){
+  askConfirm({ title:`Hapus ${p.name}?`, label:'Hapus', danger:true,
+    body:`${variantsOf(p.sku).length} varian ikut terhapus. Riwayat stok yang sudah tercatat tetap tersimpan.`,
+    onOk(){
+      DATA.variants = DATA.variants.filter(v => v.parent !== p.sku);
+      DATA.products.splice(DATA.products.indexOf(p), 1);
+      if (state.page === 'detail') state.page = 'produk';
+      toast('Produk berhasil dihapus');
+    }});
+}
+function deleteVariant(v){
+  askConfirm({ title:`Hapus varian ${v.sku}?`, label:'Hapus', danger:true,
+    body:'Riwayat stok yang sudah tercatat tetap tersimpan.',
+    onOk(){
+      DATA.variants.splice(DATA.variants.indexOf(v), 1);
+      ['in','out','audit'].forEach(k => { state[ROWS[k]] = rowsOf(k).filter(r => r.sku !== v.sku); });
+      delete state.barcode.sel[v.sku];
+      toast('Varian berhasil dihapus');
+    }});
+}
+function deactivateUser(u){
+  askConfirm({ title:`Nonaktifkan akun ${u.name}?`, label:'Nonaktifkan', danger:true,
+    body:'Akun tidak dihapus — namanya masih dipakai di riwayat stok. Akun tidak bisa masuk lagi sampai diaktifkan kembali.',
+    onOk(){ u.active = false; toast('Akun dinonaktifkan'); }});
+}
+function deleteCategory(name){
+  const used = DATA.products.filter(p => p.category === name).length;
+  if (used) return toast(`Kategori ini masih dipakai ${used} produk.`);
+  askConfirm({ title:`Hapus kategori ${name}?`, label:'Hapus', danger:true,
+    body:'Kategori yang tidak dipakai produk mana pun aman dihapus.',
+    onOk(){ DATA.categories.splice(DATA.categories.indexOf(name), 1); toast('Kategori berhasil dihapus'); }});
+}
+
+/* ---------- masuk / keluar ---------- */
+function login(){
+  const u = DATA.users.find(x => x.email === state.form.email.trim().toLowerCase());
+  if (!u)         { state.formErr = { email:'Email tidak terdaftar.' }; return render(); }
+  if (!u.active)  { state.formErr = { email:'Akun ini nonaktif. Hubungi Owner.' }; return render(); }
+  if (!state.form.password) { state.formErr = { password:'Kata sandi wajib diisi.' }; return render(); }
+  DATA.me = { name:u.name, email:u.email };
+  state.role = u.role;
+  state.authed = true; state.page = 'dashboard'; state.form = {}; state.formErr = {};
+  toast(`Selamat datang, ${u.name.split(' ')[0]}`);
+}
+function logout(){
+  askConfirm({ title:'Keluar dari Kanona?', label:'Keluar', danger:false,
+    body:'Pekerjaan yang belum disimpan di Stok Masuk, Stok Keluar dan Audit Stok akan hilang.',
+    onOk(){
+      state.authed = false; state.profileOpen = false;
+      state.form = { email:'', password:'' }; state.formErr = {};
+      render();
+    }});
+}
+
+/* ============================================================================
+   SHELL
+   ============================================================================ */
+function shell(content){
+  const active = { 'detail':'produk', 'cetak':'barcode' }[state.page] || state.page;
+  return `
+  <div class="app">
+    <header class="navbar">
+      <div class="brand">
+        <div class="logo">K</div>
+        <span class="brand-name">Kanona</span>
+        <span class="chip chip-grey" style="margin-left:8px">Inventori</span>
+      </div>
+      <button class="nav-item" style="width:auto;height:48px;padding:0 10px" onclick="state.profileOpen=!state.profileOpen;render()">
+        <span style="width:36px;height:36px;border-radius:999px;background:var(--blue-bg);color:var(--primary);
+          display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px">${initials(DATA.me.name)}</span>
+        <span class="stack">
+          <span style="font-size:14px;font-weight:500;color:var(--text)">${DATA.me.name}</span>
+          <span style="font-size:12px;color:var(--text-2)">${state.role}</span>
+        </span>
+        ${icon('chevronDown',16,'#6B7280',1.9)}
+      </button>
+      ${state.profileOpen ? `
+        <div style="position:fixed;inset:0;z-index:35" onclick="state.profileOpen=false;render()"></div>
+        <div class="dropdown">
+          <div style="padding:10px 12px 12px;border-bottom:1px solid var(--divider);margin-bottom:6px">
+            <div style="font-size:14px;font-weight:500">${DATA.me.name}</div>
+            <div style="font-size:12px;color:var(--text-2);margin-top:2px">${DATA.me.email}</div>
+          </div>
+          <button class="menu-item danger" onclick="logout()">${icon('logout',18)} Keluar</button>
+        </div>` : ''}
+    </header>
+
+    <div class="body">
+      <nav class="sidebar">
+        <div class="side-label">Menu</div>
+        ${MENU.map(m => `
+          <button class="nav-item ${active===m.id?'active':''}" onclick="go('${m.id}')">
+            ${icon(m.icon)} <span>${m.label}</span>
+          </button>`).join('')}
+      </nav>
+      <main class="main">${content}</main>
+    </div>
+  </div>
+
+  ${state.modal ? modals[state.modal]() : ''}
+  ${state.toast ? `
+    <div class="toast">
+      <span class="toast-icon">${icon('check',16,'#fff',2.4)}</span>
+      <span style="font-size:14px;font-weight:500">${state.toast}</span>
+    </div>` : ''}
+  `;
+}
+
+/* ---------- Masuk ---------- */
+function loginPage(){
+  const e = state.formErr;
+  return `
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px">
+    <div class="card card-pad" style="width:400px">
+      <div class="row" style="gap:10px;margin-bottom:24px">
+        <div class="logo">K</div>
+        <span class="brand-name">Kanona</span>
+      </div>
+      <h1 style="font-size:22px;font-weight:700;letter-spacing:-.01em">Masuk</h1>
+      <p class="page-sub" style="margin-bottom:24px">Akun dibuat oleh Owner di dalam sistem.</p>
+
+      <div class="field" style="margin-bottom:16px">
+        <label class="label">Email</label>
+        <input class="input ${e.email?'error':''}" data-fid="login-email" placeholder="nama@kanona.id"
+          value="${esc(state.form.email || '')}"
+          oninput="state.form.email=this.value;delete state.formErr.email"
+          onkeydown="if(event.key==='Enter')login()">
+        ${e.email?`<div class="hint err">${e.email}</div>`:''}
+      </div>
+      <div class="field" style="margin-bottom:24px">
+        <label class="label">Kata Sandi</label>
+        <input class="input ${e.password?'error':''}" data-fid="login-pass" type="password" placeholder="••••••••"
+          value="${esc(state.form.password || '')}"
+          oninput="state.form.password=this.value;delete state.formErr.password"
+          onkeydown="if(event.key==='Enter')login()">
+        ${e.password?`<div class="hint err">${e.password}</div>`:''}
+      </div>
+      <button class="btn btn-primary" style="width:100%;height:44px;justify-content:center" onclick="login()">Masuk</button>
+
+      <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--divider)">
+        <div style="font-size:12px;color:var(--text-2);margin-bottom:8px">
+          Akun contoh untuk mencoba prototipe — kata sandi apa saja:</div>
+        ${['Owner','Manager','Admin'].map(r => DATA.users.find(u => u.active && u.role === r))
+          .filter(Boolean).map(u => `
+          <button class="btn btn-secondary btn-sm" style="margin:0 6px 6px 0"
+            onclick="state.form={email:'${u.email}',password:'kanona123'};state.formErr={};render()">
+            ${u.role} · ${u.name.split(' ')[0]}</button>`).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ============================================================================
+   PAGES
+   ============================================================================ */
+const pages = {};
+
+/* ---------- Dashboard ---------- */
+pages.dashboard = () => {
+  const a = attention();
+  const f = state.attentionFilter;
+  const rows = a[f];
+  const recent = DATA.movements.slice(0, 6);
+  return `
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Dashboard</h1>
+      <p class="page-sub">Ringkasan pergerakan stok hari ini</p>
+    </div>
+    <div class="row">
+      <button class="btn btn-secondary" onclick="toast('Data disegarkan')">${icon('refresh')} Segarkan</button>
+      <button class="btn btn-primary" onclick="go('stok-masuk')">${icon('plus',20,'currentColor',1.9)} Catat Stok Masuk</button>
+    </div>
+  </div>
+
+  <div class="stats">
+    ${stats().map(s => `
+      <div class="stat ${s.tone}">
+        <div class="stat-label">${s.label}</div>
+        <div class="stat-value">${s.value}</div>
+      </div>`).join('')}
+  </div>
+
+  <div class="card" style="margin-bottom:24px">
+    <div class="card-head">
+      <div>
+        <h2 class="card-title">Aktivitas Terbaru</h2>
+        <p class="page-sub" style="font-size:13px">Pergerakan stok terakhir dari seluruh sumber</p>
+      </div>
+      <button class="btn btn-link" onclick="go('riwayat')">Lihat semua</button>
+    </div>
+    <table>
+      <thead><tr>
+        <th style="width:110px">Waktu</th><th style="width:190px">SKU</th>
+        <th>Produk &amp; Varian</th><th style="width:150px">Aktivitas</th>
+        <th class="right" style="width:110px">Jumlah</th><th style="width:160px">Sumber</th>
+      </tr></thead>
+      <tbody>
+        ${recent.map(m => {
+          const v = variantOf(m.sku);
+          return `
+          <tr>
+            <td class="muted">${m.time}</td>
+            <td class="mono">${m.sku}</td>
+            <td><div class="stack">
+              <span>${nameOf(m.sku)}</span>
+              <span style="font-size:12px;color:var(--text-2)">${v ? labelOf(v) : '—'}</span>
+            </div></td>
+            <td><span class="chip ${activityChip(m.activity)}">${m.activity}</span></td>
+            <td class="right bold" style="color:${qtyColor(m.change)}">${signed(m.change)}</td>
+            <td class="muted">${m.source}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px 16px">
+      <div class="row">
+        ${icon('warning',20,'#F59E0B')}
+        <h2 class="card-title">Perlu Perhatian</h2>
+        <span class="chip chip-amber" style="font-weight:600">${a.habis.length + a.menipis.length} varian</span>
+      </div>
+      <button class="btn btn-link" onclick="go('produk')">Kelola produk</button>
+    </div>
+    <div class="row" style="gap:8px;padding:0 24px 16px;border-bottom:1px solid var(--border)">
+      <button class="fchip red ${f==='habis'?'on':''}"
+        onclick="state.attentionFilter='habis';render()">Habis <span class="count">${a.habis.length}</span></button>
+      <button class="fchip amber ${f==='menipis'?'on':''}"
+        onclick="state.attentionFilter='menipis';render()">Menipis <span class="count">${a.menipis.length}</span></button>
+    </div>
+    ${rows.length ? `
+    <table>
+      <thead><tr>
+        <th style="width:220px">SKU</th><th>Varian</th>
+        <th class="right" style="width:160px">Sisa Stok</th>
+        <th style="width:170px">Status</th><th class="right" style="width:190px">Tindakan</th>
+      </tr></thead>
+      <tbody>
+        ${rows.map(r => `
+          <tr>
+            <td class="mono">${r.sku}</td>
+            <td>${r.variant}</td>
+            <td class="right bold" style="color:${f==='habis'?'var(--red-fg)':'var(--amber-fg)'}">${r.left}</td>
+            <td><span class="chip ${f==='habis'?'chip-red':'chip-amber'}">${f==='habis'?'Habis':'Menipis'}</span></td>
+            <td class="right"><button class="btn btn-secondary btn-sm"
+              onclick="restockFrom('${r.sku}')">Catat stok masuk</button></td>
+          </tr>`).join('')}
+      </tbody>
+    </table>`
+    : emptyState('Tidak ada yang perlu perhatian', f==='habis'
+        ? 'Tidak ada varian yang habis saat ini.'
+        : 'Tidak ada varian di bawah batas stok menipis.')}
+  </div>`;
+};
+
+/* Jump to Stok Masuk with that variant already picked. */
+function restockFrom(sku){
+  if (!pickedRow('in', sku)) state.inRows.push({ sku, qty:'1' });
+  go('stok-masuk');
+  toast(sku + ' ditambahkan ke Stok Masuk');
+}
+
+/* ---------- Produk ---------- */
+pages.produk = () => {
+  const f = state.produk;
+  const q = f.q.trim().toLowerCase();
+  const dirty = f.q || f.cat || f.sort !== 'Urutkan: Terbaru';
+  let rows = productRows().filter(p =>
+    (!f.cat || p.category === f.cat) &&
+    (!q || p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q) ||
+     variantsOf(p.sku).some(v => v.sku.toLowerCase().includes(q))));
+  if (f.sort === 'Nama A–Z')        rows = [...rows].sort((a,b) => a.name.localeCompare(b.name));
+  if (f.sort === 'Stok Terbanyak')  rows = [...rows].sort((a,b) => b.stock - a.stock);
+  if (f.sort === 'Stok Tersedikit') rows = [...rows].sort((a,b) => a.stock - b.stock);
+  const totalVar = DATA.variants.filter(v => v.active).length;
+  return `
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Produk</h1>
+      <p class="page-sub">${DATA.products.length} produk · ${totalVar} varian aktif</p>
+    </div>
+    ${can('manageProducts') ? `
+      <button class="btn btn-primary" onclick="openModal('product','add')">
+        ${icon('plus',20,'currentColor',1.9)} Buat Produk</button>` : ''}
+  </div>
+
+  <div class="card">
+    <div class="toolbar">
+      <div class="search" style="flex:1;max-width:360px">
+        ${icon('search',20,'#9CA3AF')}
+        <input class="input" data-fid="produk-q" placeholder="Cari nama produk atau SKU"
+          value="${esc(f.q)}" oninput="state.produk.q=this.value;render()">
+      </div>
+      ${selectBox(['Semua Kategori', ...DATA.categories], f.cat || 'Semua Kategori',
+        "state.produk.cat=this.value==='Semua Kategori'?'':this.value;render()")}
+      ${selectBox(['Urutkan: Terbaru','Nama A–Z','Stok Terbanyak','Stok Tersedikit'], f.sort,
+        'state.produk.sort=this.value;render()')}
+      <div class="spacer"></div>
+      <button class="btn ${dirty?'btn-link':'btn-secondary'}" style="height:44px" ${dirty?'':'disabled'}
+        onclick="state.produk={q:'',cat:'',sort:'Urutkan: Terbaru'};toast('Filter dikembalikan ke awal')">
+        ${icon('refresh')} Reset Filter
+      </button>
+    </div>
+
+    ${rows.length ? `
+    <div class="scroll-y" style="max-height:520px">
+      <table>
+        <thead><tr>
+          <th style="width:88px">Foto</th><th>Nama Produk</th>
+          <th style="width:150px">Kategori</th><th style="width:190px">SKU Induk</th>
+          <th class="right" style="width:120px">Varian</th>
+          <th class="right" style="width:130px">Total Stok</th>
+          ${can('manageProducts') ? '<th class="right" style="width:110px">Aksi</th>' : ''}
+        </tr></thead>
+        <tbody>
+          ${rows.map((p,i) => `
+            <tr style="cursor:pointer" onclick="go('detail','${p.sku}')">
+              <td>${photoBox(40)}</td>
+              <td style="font-weight:500">${p.name}</td>
+              <td><span class="chip chip-grey">${p.category}</span></td>
+              <td class="mono muted">${p.sku}</td>
+              <td class="right muted">${p.variants}</td>
+              <td class="right bold">${num(p.stock)}</td>
+              ${can('manageProducts') ? `
+                <td class="right" style="padding-right:16px">
+                  <button class="icon-btn" title="Edit produk"
+                    onclick="event.stopPropagation();openModal('product','edit',DATA.products.find(x=>x.sku==='${p.sku}'))">${icon('pencil',18)}</button>
+                  <button class="icon-btn del" title="Hapus produk"
+                    onclick="event.stopPropagation();deleteProduct(DATA.products.find(x=>x.sku==='${p.sku}'))">${icon('trash',18)}</button>
+                </td>` : ''}
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+    <div class="table-foot" style="text-align:center">Menampilkan ${rows.length} dari ${DATA.products.length} produk</div>`
+    : emptyState('Produk tidak ditemukan', 'Coba kata kunci lain atau kosongkan filter kategori.')}
+  </div>`;
+};
+
+/* ---------- Detail Produk ---------- */
+pages.detail = () => {
+  const p = productOf(state.detailSku) || DATA.products[0];
+  if (!p) return emptyState('Produk tidak ada', 'Produk ini sudah dihapus.');
+  const vs = variantsOf(p.sku);
+  const total = vs.reduce((s,v) => s + v.stock, 0);
+  return `
+  <button class="nav-item" style="width:auto;height:32px;margin-bottom:16px;font-size:13px" onclick="go('produk')">
+    ${icon('chevronLeft',18,'currentColor',1.8)} Kembali ke Produk
+  </button>
+
+  <div class="card card-pad" style="display:flex;gap:24px;align-items:flex-start;margin-bottom:24px">
+    ${photoBox(120,'foto produk')}
+    <div style="flex:1">
+      <h1 class="page-title">${p.name}</h1>
+      <div style="display:flex;gap:32px;margin-top:16px">
+        ${[['Kategori',p.category],['SKU Induk',p.sku],['Jumlah Varian',vs.length+' varian'],['Total Stok',num(total)+' pcs']]
+          .map(([k,v]) => `<div>
+            <div style="font-size:12px;color:var(--text-2)">${k}</div>
+            <div style="font-size:14px;font-weight:500;margin-top:4px${k==='SKU Induk'?';font-family:var(--mono)':''}">${v}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+    ${can('manageProducts') ? `
+      <div class="row">
+        <button class="btn btn-secondary" onclick="openModal('product','edit',productOf('${p.sku}'))">Edit Produk</button>
+        <button class="btn btn-primary" onclick="openModal('variant','add',{parent:'${p.sku}'})">
+          ${icon('plus',20,'currentColor',1.9)} Tambah Varian</button>
+      </div>` : ''}
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h2 class="card-title">Varian</h2>
+      <span style="font-size:13px;color:var(--text-2)">${vs.length} varian</span></div>
+    ${vs.length ? `
+    <table>
+      <thead><tr>
+        <th style="width:120px">Barcode</th><th>SKU</th>
+        <th style="width:150px">Warna</th><th style="width:110px">Ukuran</th>
+        <th class="right" style="width:150px">Harga</th>
+        <th class="right" style="width:140px">Stok Saat Ini</th>
+        ${can('manageProducts') ? '<th class="right" style="width:110px">Aksi</th>' : ''}
+      </tr></thead>
+      <tbody>
+        ${vs.map(v => {
+          const dim = v.active ? '' : 'color:var(--text-3)';
+          return `<tr>
+            <td><button class="icon-btn" style="width:auto;padding:4px" title="Pratinjau varian"
+              onclick="openModal('preview','view',variantOf('${v.sku}'))">${barcodeBox(72,26)}</button></td>
+            <td><span class="row" style="gap:8px">
+              <span class="mono" style="${dim}">${v.sku}</span>
+              ${v.active?'':'<span class="chip chip-grey chip-sm">Nonaktif</span>'}
+            </span></td>
+            <td style="${dim}">${v.color}</td>
+            <td style="${dim}">${v.size}</td>
+            <td class="right" style="${dim}">${rupiah(v.price)}</td>
+            <td class="right bold" style="${v.stock<=p.threshold?'color:var(--red-fg)':''}">${num(v.stock)}</td>
+            ${can('manageProducts') ? `
+              <td class="right" style="padding-right:16px">
+                <button class="icon-btn" title="Edit varian"
+                  onclick="openModal('variant','edit',variantOf('${v.sku}'))">${icon('pencil',18)}</button>
+                <button class="icon-btn del" title="Hapus varian"
+                  onclick="deleteVariant(variantOf('${v.sku}'))">${icon('trash',18)}</button>
+              </td>` : ''}
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>`
+    : emptyState('Belum ada varian', 'Tambah varian agar produk ini punya stok.')}
+  </div>`;
+};
+
+/* ---------- Shared two-panel picker ----------------------------------------
+   Left panel: every variant, ticked on or off. Right panel: the ones ticked,
+   each with the number being recorded. Reused by Stok Masuk, Stok Keluar
+   (Manual tab) and Audit Stok — in production this is VariantPicker.tsx. */
+function pickerList(kind){
+  const f = state.pick[kind];
+  const q = f.q.trim().toLowerCase();
+  return DATA.variants.filter(v => {
+    /* Inactive variants are hidden from Stok Masuk and Stok Keluar, but stay
+       in Audit Stok — the goods may still be on the shelf. */
+    if (kind !== 'audit' && !v.active) return false;
+    const p = productOf(v.parent);
+    if (f.cat && p.category !== f.cat) return false;
+    if (q && !(v.sku.toLowerCase().includes(q) || p.name.toLowerCase().includes(q) ||
+               labelOf(v).toLowerCase().includes(q))) return false;
+    return true;
+  });
+}
+
+function variantPicker(kind){
+  const list = pickerList(kind);
+  const f = state.pick[kind];
+  return `
+  <div class="card panel">
+    <div class="card-head" style="flex:none">
+      <h2 class="card-title">Pilih Varian</h2>
+      <span style="font-size:13px;color:var(--text-2)">${list.length} varian</span>
+    </div>
+    <div class="toolbar" style="flex:none">
+      <div class="search" style="flex:1;min-width:0">
+        ${icon('search',20,'#9CA3AF')}
+        <input class="input with-scan" data-fid="pick-${kind}" placeholder="Cari nama produk atau SKU"
+          value="${esc(f.q)}" oninput="state.pick.${kind}.q=this.value;render()"
+          onkeydown="pickerKey('${kind}',event,this.value)">
+        <button class="scan-btn" title="Pindai barcode — ketik atau pindai SKU lalu tekan Enter"
+          onclick="focusPick('${kind}')">${icon('scan',18)}</button>
+      </div>
+      ${selectBox(['Semua Kategori', ...DATA.categories], f.cat || 'Semua Kategori',
+        `state.pick.${kind}.cat=this.value==='Semua Kategori'?'':this.value;render()`)}
+    </div>
+    <div class="panel-list">
+      ${list.length ? list.map(v => {
+        const on = !!pickedRow(kind, v.sku);
+        return `
+        <button class="picker-row ${on?'on':''}" onclick="togglePick('${kind}','${v.sku}')">
+          ${photoBox(48)}
+          <span class="stack" style="flex:1;min-width:0">
+            <span style="font-size:15px;font-weight:600">${nameOf(v.sku)}</span>
+            <span style="font-size:13px;color:var(--text-2)">
+              <span class="mono">${v.sku}</span> · ${labelOf(v)} · ${rupiah(v.price)}${v.active?'':' · nonaktif'}</span>
+          </span>
+          <span class="stack" style="align-items:flex-end">
+            <span style="font-size:16px;font-weight:700">${num(v.stock)}</span>
+            <span style="font-size:12px;color:var(--text-3)">stok</span>
+          </span>
+          ${on ? `<span class="pick-check">${icon('check',14,'#fff',2.6)}</span>` : ''}
+        </button>`;
+      }).join('')
+      : emptyState('Varian tidak ditemukan', 'Coba kata kunci lain atau ganti kategori.')}
+    </div>
+  </div>`;
+}
+function focusPick(kind){
+  const el = document.querySelector(`[data-fid="pick-${kind}"]`);
+  if (el) el.focus();
+  toast('Pindai barcode atau ketik SKU, lalu tekan Enter');
+}
+
+/* The right-hand panel. Only the controls on each row differ per screen. */
+function selectionPanel(kind, title){
+  const rows = rowsOf(kind);
+  return `
+  <div class="card panel">
+    <div class="card-head" style="flex:none">
+      <h2 class="card-title">${title}</h2>
+      <span style="font-size:13px;color:var(--text-2)">${rows.length} varian dipilih</span>
+    </div>
+    ${rows.length === 0 ? `
+      <div class="empty-sel">Belum ada varian dipilih.<br>Pilih varian di panel kiri atau pindai barcode.</div>`
+    : `
+    <div class="panel-list">
+      ${rows.map(r => {
+        const v = variantOf(r.sku);
+        return `
+        <div class="sel-row">
+          ${photoBox(48)}
+          <div class="stack">
+            <span style="font-size:15px;font-weight:600">${nameOf(v.sku)}</span>
+            <span style="font-size:13px;color:var(--text-2)"><span class="mono">${v.sku}</span> · ${labelOf(v)} · ${kind === 'audit' ? `Stok sistem ${v.stock}` : `Stok ${v.stock}`}</span>
+          </div>
+          <div class="sel-controls">
+            ${kind === 'audit' ? auditControls(r, v) : qtyControls(kind, r, v)}
+            <button class="icon-btn" title="Hapus dari daftar"
+              onclick="removePick('${kind}','${v.sku}')">${icon('close',18)}</button>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`}
+  </div>`;
+}
+
+const qtyControls = (kind, r, v) => `
+  <button class="btn btn-secondary qty-btn" onclick="bumpQty('${kind}','${r.sku}',-1)">−</button>
+  <input class="input qty-input ${kind==='out' && qtyNum(r) > v.stock ? 'error' : ''}"
+    data-fid="qty-${kind}-${r.sku}" inputmode="numeric" value="${r.qty}"
+    oninput="setRow('${kind}','${r.sku}','qty',this.value)">
+  <button class="btn btn-secondary qty-btn" onclick="bumpQty('${kind}','${r.sku}',1)">+</button>`;
+
+/* Selisih = physical count − system stock. Zero writes no movement row at all,
+   so it is shown neutral rather than as a change. */
+function auditControls(r, v){
+  const diff = (+r.physical || 0) - v.stock;
+  const tone = diff === 0 ? ['var(--bg)','var(--text-2)','var(--border)']
+    : diff < 0 ? ['var(--red-bg)','var(--red-fg)','var(--red-br)']
+               : ['var(--green-bg)','var(--green-fg)','var(--green-br)'];
+  return `
+  <input class="input qty-input" data-fid="qty-audit-${r.sku}" inputmode="numeric" value="${r.physical}"
+    oninput="setRow('audit','${r.sku}','physical',this.value)">
+  <div class="diff-box" style="background:${tone[0]};color:${tone[1]};border-color:${tone[2]}"
+    title="Selisih">${diff === 0 ? '0' : signed(diff)}</div>`;
+}
+
+/* Batal + Simpan, in the page header on all three stock screens. */
+const stockActions = (label, onSave, kind) => {
+  const n = rowsOf(kind).length;
+  return `
+  <div class="row" style="gap:12px">
+    <button class="btn btn-secondary" ${n?'':'disabled'} onclick="clearPicks('${kind}')">Batal</button>
+    <button class="btn btn-primary" ${n?'':'disabled'} onclick="${onSave}">${icon('save')} ${label}</button>
+  </div>`;
+};
+
+/* ---------- Stok Masuk ---------- */
+pages['stok-masuk'] = () => `
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Stok Masuk</h1>
+      <p class="page-sub">Pindai barcode atau pilih varian yang masuk ke gudang.</p>
+    </div>
+    ${stockActions('Simpan', 'saveStockIn()', 'in')}
+  </div>
+  <div class="panels">
+    ${variantPicker('in')}
+    ${selectionPanel('in', 'Stok Masuk')}
+  </div>`;
+
+/* ---------- Stok Keluar ---------- */
+pages['stok-keluar'] = () => {
+  const showManual = can('manualStockOut');
+  const tab = showManual ? state.stockOutTab : 'marketplace';
+  const f = state.orderF;
+  const q = f.q.trim().toLowerCase();
+  const orders = DATA.orders.filter(o =>
+    (!f.channel || o.channel === f.channel) &&
+    (!q || o.invoice.toLowerCase().includes(q) || o.sku.toLowerCase().includes(q)));
+  return `
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Stok Keluar</h1>
+      <p class="page-sub">${tab === 'manual'
+        ? 'Pindai barcode atau pilih varian yang keluar dari gudang.'
+        : 'Pesanan marketplace tercatat otomatis. Pengeluaran lain dicatat manual.'}</p>
+    </div>
+    ${tab === 'manual' ? stockActions('Simpan', 'saveStockOut()', 'out') : ''}
+  </div>
+
+  ${showManual ? `
+    <div class="tabs-pill">
+      <button class="tab-pill ${tab==='marketplace'?'on':''}" onclick="state.stockOutTab='marketplace';render()">Marketplace</button>
+      <button class="tab-pill ${tab==='manual'?'on':''}" onclick="state.stockOutTab='manual';render()">Manual</button>
+    </div>` : ''}
+
+  ${tab === 'marketplace' ? `
+    <div class="card">
+      <div class="toolbar">
+        <div class="search" style="flex:1;max-width:320px">
+          ${icon('search',20,'#9CA3AF')}
+          <input class="input" data-fid="order-q" placeholder="Cari invoice atau SKU"
+            value="${esc(f.q)}" oninput="state.orderF.q=this.value;render()">
+        </div>
+        ${selectBox(['Semua Marketplace','Shopee','Tokopedia','TikTok Shop'], f.channel || 'Semua Marketplace',
+          "state.orderF.channel=this.value==='Semua Marketplace'?'':this.value;render()")}
+        <div class="spacer"></div>
+        <span class="row" style="gap:8px;font-size:13px;color:var(--text-2);background:var(--bg);
+          border:1px solid var(--border);border-radius:var(--r-sm);height:32px;padding:0 12px">
+          ${icon('lock',16,'#6B7280')} Hanya baca
+        </span>
+      </div>
+      ${orders.length ? `
+      <div class="scroll-y">
+        <table>
+          <thead><tr>
+            <th style="width:200px">Invoice</th><th style="width:180px">Marketplace</th>
+            <th>SKU</th><th class="right" style="width:110px">Jumlah</th><th style="width:170px">Status</th>
+          </tr></thead>
+          <tbody>
+            ${orders.map(o => `
+              <tr>
+                <td class="mono">${o.invoice}</td>
+                <td>${o.channel}</td>
+                <td class="mono muted">${o.sku}</td>
+                <td class="right bold">${o.qty}</td>
+                <td><span class="chip ${orderChip(o.status)}">${o.status}</span></td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="table-foot" style="text-align:center">
+        Menampilkan ${orders.length} dari ${DATA.orders.length} pesanan contoh · penarikan otomatis aktif setelah API marketplace tersambung
+      </div>`
+      : emptyState('Pesanan tidak ditemukan', 'Coba kata kunci lain atau ganti marketplace.')}
+    </div>`
+  : `
+    <div class="panels">
+      ${variantPicker('out')}
+      ${selectionPanel('out', 'Stok Keluar')}
+    </div>`}`;
+};
+
+/* ---------- Audit Stok ---------- */
+pages.audit = () => `
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Audit Stok</h1>
+      <p class="page-sub">Pilih varian, isi hasil hitung fisik, selisih tercatat otomatis sebagai penyesuaian.</p>
+    </div>
+    ${stockActions('Simpan Penyesuaian', 'saveAudit()', 'audit')}
+  </div>
+  <div class="panels">
+    ${variantPicker('audit')}
+    ${selectionPanel('audit', 'Audit Stok')}
+  </div>`;
+
+/* ---------- Riwayat Stok ---------- */
+pages.riwayat = () => {
+  const f = state.history;
+  const rows = historyRows();
+  const users = [...new Set(DATA.movements.map(m => m.user))];
+  const dirty = f.from !== '2026-08-19' || f.to !== '2026-08-25' || f.activity || f.source || f.user || f.q;
+  return `
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Riwayat Stok</h1>
+      <p class="page-sub">Seluruh pergerakan stok tercatat permanen.</p>
+    </div>
+    <button class="btn btn-secondary" onclick="exportCsv()">${icon('download')} Ekspor CSV</button>
+  </div>
+
+  <div class="card">
+    <div class="toolbar">
+      <div class="row" style="gap:8px">
+        <input class="input" data-fid="hist-from" type="date" style="width:138px" value="${f.from}"
+          onchange="state.history.from=this.value;render()">
+        <span style="color:var(--text-3)">–</span>
+        <input class="input" data-fid="hist-to" type="date" style="width:138px" value="${f.to}"
+          onchange="state.history.to=this.value;render()">
+      </div>
+      ${selectBox(['Semua Aktivitas','Stok Masuk','Stok Keluar','Penyesuaian'], f.activity || 'Semua Aktivitas',
+        "state.history.activity=this.value==='Semua Aktivitas'?'':this.value;render()")}
+      ${selectBox(['Semua Sumber','Manual','Audit Stok','Shopee','Tokopedia','TikTok Shop'], f.source || 'Semua Sumber',
+        "state.history.source=this.value==='Semua Sumber'?'':this.value;render()")}
+      ${selectBox(['Semua Pengguna', ...users], f.user || 'Semua Pengguna',
+        "state.history.user=this.value==='Semua Pengguna'?'':this.value;render()")}
+      <div class="search" style="flex:1;min-width:170px">
+        ${icon('search',20,'#9CA3AF')}
+        <input class="input" data-fid="hist-q" placeholder="Cari SKU atau produk"
+          value="${esc(f.q)}" oninput="state.history.q=this.value;render()">
+      </div>
+      <button class="btn ${dirty?'btn-link':'btn-secondary'}" style="height:44px" ${dirty?'':'disabled'}
+        onclick="resetHistory()">${icon('refresh')} Reset Filter</button>
+    </div>
+
+    ${rows.length ? `
+    <div class="scroll-y scroll-x" style="max-height:420px">
+      <table style="table-layout:fixed;min-width:1300px">
+        <thead><tr>
+          <th style="width:124px">Tanggal</th><th style="width:72px;padding:12px">Waktu</th>
+          <th style="width:178px;padding:12px">SKU</th><th style="width:250px;padding:12px">Produk &amp; Varian</th>
+          <th class="right" style="width:88px;padding:12px">Sebelum</th>
+          <th class="right" style="width:104px;padding:12px">Perubahan</th>
+          <th class="right" style="width:88px;padding:12px">Sesudah</th>
+          <th style="width:136px;padding:12px">Aktivitas</th>
+          <th style="width:124px;padding:12px">Sumber</th>
+          <th style="width:180px">Pengguna</th>
+        </tr></thead>
+        <tbody>
+          ${rows.map(m => {
+            const v = variantOf(m.sku);
+            return `
+            <tr>
+              <td class="muted" style="white-space:nowrap">${fmtDate(m.date)}</td>
+              <td class="muted" style="padding:0 12px">${m.time}</td>
+              <td class="mono" style="padding:0 12px">${m.sku}</td>
+              <td style="padding:0 12px"><div class="stack">
+                <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${nameOf(m.sku)}</span>
+                <span style="font-size:12px;color:var(--text-2)">${v ? labelOf(v) : '—'}</span>
+              </div></td>
+              <td class="right muted" style="padding:0 12px">${m.before}</td>
+              <td class="right bold" style="padding:0 12px;color:${qtyColor(m.change)}">${signed(m.change)}</td>
+              <td class="right bold" style="padding:0 12px">${m.after}</td>
+              <td style="padding:0 12px"><span class="chip ${activityChip(m.activity)}">${m.activity}</span></td>
+              <td class="muted" style="padding:0 12px">${m.source}</td>
+              <td class="muted" style="white-space:nowrap">${m.user}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+    <div class="table-foot" style="text-align:center;border-top:1px solid var(--border)">
+      Menampilkan ${rows.length} dari ${DATA.movements.length} catatan
+    </div>`
+    : emptyState('Tidak ada catatan', 'Tidak ada pergerakan stok pada rentang tanggal dan filter ini.')}
+  </div>`;
+};
+
+/* ---------- Barcode ---------- */
+pages.barcode = () => {
+  const groups = barcodeGroups();
+  const visible = groups.flatMap(g => g.variants);
+  const allOn = visible.length > 0 && visible.every(v => state.barcode.sel[v.sku] !== undefined);
+  const someOn = visible.some(v => state.barcode.sel[v.sku] !== undefined);
+  const total = printTotal();
+  const first = printSkus().map(variantOf).find(Boolean);
+  return `
+  <div style="display:grid;grid-template-columns:1fr 320px;gap:24px;align-items:start">
+    <div>
+      <div class="page-head">
+        <div>
+          <h1 class="page-title">Barcode</h1>
+          <p class="page-sub">Pilih varian yang akan dicetak labelnya.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="toolbar">
+          <div class="search" style="flex:1;max-width:300px">
+            ${icon('search',20,'#9CA3AF')}
+            <input class="input" data-fid="bc-q" placeholder="Cari produk atau SKU"
+              value="${esc(state.barcode.q)}" oninput="state.barcode.q=this.value;render()">
+          </div>
+          ${selectBox(['Semua Kategori', ...DATA.categories], state.barcode.cat || 'Semua Kategori',
+            "state.barcode.cat=this.value==='Semua Kategori'?'':this.value;render()")}
+          <div class="spacer"></div>
+          <label class="row" style="gap:8px;cursor:pointer">
+            ${checkbox(allOn, 'toggleAllLabels(this.checked)',
+              (!allOn && someOn) ? 'data-indet="1"' : '')}
+            Pilih Semua
+          </label>
+        </div>
+
+        ${groups.length ? groups.map(g => {
+          const open = !!state.barcode.open[g.p.sku];
+          const on = g.variants.every(v => state.barcode.sel[v.sku] !== undefined);
+          const part = !on && g.variants.some(v => state.barcode.sel[v.sku] !== undefined);
+          return `
+          <div style="border-bottom:1px solid var(--divider)">
+            <button class="nav-item" style="height:auto;padding:14px 24px;border-radius:0"
+              onclick="state.barcode.open['${g.p.sku}']=!state.barcode.open['${g.p.sku}'];render()">
+              <span style="display:inline-flex;transform:rotate(${open?90:0}deg);transition:transform .15s">
+                ${icon('chevronRight',18,'#6B7280',1.9)}
+              </span>
+              ${checkbox(on, `toggleGroup('${g.p.sku}',this.checked)`, part?'data-indet="1"':'')}
+              <span style="width:2px"></span>
+              <span style="font-size:15px;font-weight:600;color:var(--text)">${g.p.name}</span>
+              <span style="font-size:13px;color:var(--text-2)">${g.variants.length} varian</span>
+            </button>
+            ${open ? `
+              <table>
+                <thead><tr>
+                  <th style="width:78px;border-bottom-color:var(--divider)"></th>
+                  <th style="width:130px;padding:10px 16px;border-bottom-color:var(--divider)">Barcode</th>
+                  <th style="width:200px;padding:10px 16px;border-bottom-color:var(--divider)">SKU</th>
+                  <th style="padding:10px 16px;border-bottom-color:var(--divider)">Varian</th>
+                  <th class="right" style="width:150px;padding:10px 24px;border-bottom-color:var(--divider)">Jumlah Cetak</th>
+                </tr></thead>
+                <tbody>
+                  ${g.variants.map(v => {
+                    const sel = state.barcode.sel[v.sku] !== undefined;
+                    return `
+                    <tr>
+                      <td style="padding-left:54px">
+                        ${checkbox(sel, `toggleLabel('${v.sku}',this.checked)`)}
+                      </td>
+                      <td style="padding:0 16px">${barcodeBox(72,24)}</td>
+                      <td class="mono" style="padding:0 16px">${v.sku}</td>
+                      <td style="padding:0 16px">${labelOf(v)}</td>
+                      <td class="right" style="padding:0 24px">
+                        <input class="input" data-fid="bc-qty-${v.sku}" inputmode="numeric"
+                          style="width:80px;height:36px;text-align:center" ${sel?'':'disabled'}
+                          value="${sel ? state.barcode.sel[v.sku] : ''}"
+                          oninput="setLabelQty('${v.sku}',this.value)">
+                      </td>
+                    </tr>`;
+                  }).join('')}
+                </tbody>
+              </table>` : ''}
+          </div>`;
+        }).join('')
+        : emptyState('Varian tidak ditemukan', 'Coba kata kunci lain atau ganti kategori.')}
+      </div>
+    </div>
+
+    <div class="card card-pad" style="margin-top:86px">
+      <h2 class="card-title" style="margin-bottom:4px">Pratinjau</h2>
+      <p class="page-sub" style="font-size:13px;margin:0 0 20px">
+        Label ${state.paper.size} · ${total} label terpilih</p>
+      <div style="border:1px dashed var(--border);border-radius:var(--r);padding:16px;background:var(--bg)">
+        ${first ? `
+        <div style="background:#fff;border:1px solid var(--border);border-radius:6px;padding:10px 12px;
+          display:flex;flex-direction:column;align-items:center;gap:6px">
+          <span style="font-size:11px;font-weight:600;text-align:center">${nameOf(first.sku)} · ${labelOf(first)}</span>
+          ${barcodeBox(150,44)}
+          <span style="font:10px var(--mono);color:var(--text-2)">${first.sku}</span>
+        </div>`
+        : `<div style="text-align:center;font-size:13px;color:var(--text-2);padding:24px 0">
+             Centang varian untuk melihat pratinjau label.</div>`}
+      </div>
+      <button class="btn btn-primary" style="width:100%;height:44px;margin-top:20px;justify-content:center"
+        ${total?'':'disabled'} onclick="go('cetak')">${icon('print')} Lanjut ke Pengaturan Cetak</button>
+    </div>
+  </div>`;
+};
+
+/* ---------- Pengaturan Cetak ---------- */
+pages.cetak = () => {
+  const L = state.labelParts;
+  const total = printTotal();
+  const first = printSkus().map(variantOf).find(Boolean);
+  const perRow = +state.paper.perRow[0];
+  const sheets = Math.max(1, Math.ceil(total / (perRow * 8)));
+  const opts = first ? [
+    ['nama','Nama produk', nameOf(first.sku)],
+    ['varian','Warna dan ukuran', labelOf(first)],
+    ['sku','Kode SKU', first.sku],
+    ['harga','Harga jual', rupiah(first.price)],
+  ] : [];
+  if (!first) return `
+    <button class="nav-item" style="width:auto;height:32px;margin-bottom:16px;font-size:13px" onclick="go('barcode')">
+      ${icon('chevronLeft',18,'currentColor',1.8)} Kembali ke Barcode
+    </button>
+    <div class="card">${emptyState('Belum ada label dipilih','Kembali ke halaman Barcode dan centang varian yang ingin dicetak.')}</div>`;
+  return `
+  <button class="nav-item" style="width:auto;height:32px;margin-bottom:16px;font-size:13px" onclick="go('barcode')">
+    ${icon('chevronLeft',18,'currentColor',1.8)} Kembali ke Barcode
+  </button>
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Pengaturan Cetak</h1>
+      <p class="page-sub">${total} label dari ${printSkus().length} varian · periksa isi label sebelum mencetak.</p>
+    </div>
+    <div class="row">
+      <button class="btn btn-secondary" onclick="toast('Unduh PDF aktif setelah bwip-js membuat gambar barcode')">Unduh PDF</button>
+      <button class="btn btn-primary" onclick="toast('${total} label dikirim ke pencetak')">
+        ${icon('print')} Cetak ${total} Label</button>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 380px;gap:24px;align-items:start">
+    <div style="display:flex;flex-direction:column;gap:24px">
+      <div class="card card-pad">
+        <h2 class="card-title">Isi Label</h2>
+        <p class="page-sub" style="font-size:13px;margin:4px 0 20px">Pilih data yang dicetak pada setiap label.</p>
+        ${opts.map(([k,label,example]) => `
+          <label class="row" style="gap:14px;padding:14px 0;border-bottom:1px solid var(--divider);cursor:pointer">
+            <input type="checkbox" ${L[k]?'checked':''} style="width:16px;height:16px;margin:0;accent-color:var(--primary)"
+              onchange="state.labelParts.${k}=this.checked;render()">
+            <span class="stack">
+              <span style="font-size:14px;font-weight:500">${label}</span>
+              <span style="font-size:12px;color:var(--text-2)">${example}</span>
+            </span>
+          </label>`).join('')}
+      </div>
+
+      <div class="card card-pad">
+        <h2 class="card-title" style="margin-bottom:20px">Format Kertas</h2>
+        <div class="grid2">
+          <div class="field"><label class="label">Ukuran Label</label>
+            ${selectBox(['50 × 30 mm','40 × 25 mm','60 × 40 mm'], state.paper.size,
+              'state.paper.size=this.value;render()')}</div>
+          <div class="field"><label class="label">Label per Baris</label>
+            ${selectBox(['3 label','2 label','4 label'], state.paper.perRow,
+              'state.paper.perRow=this.value;render()')}</div>
+          <div class="field"><label class="label">Mulai dari Posisi</label>
+            <input class="input" data-fid="paper-start" inputmode="numeric" value="${state.paper.start}"
+              oninput="state.paper.start=this.value.replace(/[^0-9]/g,'');render()">
+            <div class="hint">Untuk memakai sisa lembar stiker.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card card-pad">
+      <h2 class="card-title">Pratinjau Label</h2>
+      <p class="page-sub" style="font-size:13px;margin:4px 0 20px">Ukuran sebenarnya ${state.paper.size}</p>
+      <div style="border:1px dashed var(--border);border-radius:var(--r);padding:20px;background:var(--bg);
+        display:flex;justify-content:center">
+        <div style="background:#fff;border:1px solid var(--border);border-radius:6px;padding:12px;width:100%;
+          display:flex;flex-direction:column;align-items:center;gap:7px">
+          ${L.nama   ? `<span style="font-size:11px;font-weight:600;text-align:center">${nameOf(first.sku)}</span>` : ''}
+          ${L.varian ? `<span style="font-size:10px;color:var(--grey-fg)">${labelOf(first)}</span>` : ''}
+          ${barcodeBox(170,50)}
+          ${L.sku    ? `<span style="font:9px var(--mono);color:var(--text-2)">${first.sku}</span>` : ''}
+          ${L.harga  ? `<span style="font-size:11px;font-weight:700">${rupiah(first.price)}</span>` : ''}
+        </div>
+      </div>
+      <div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--divider)">
+        <div class="row" style="justify-content:space-between;margin-bottom:12px">
+          <span style="font-size:13px;color:var(--text-2)">Total label</span><span class="bold">${total} label</span>
+        </div>
+        <div class="row" style="justify-content:space-between">
+          <span style="font-size:13px;color:var(--text-2)">Perkiraan lembar</span><span class="bold">${sheets} lembar</span>
+        </div>
+      </div>
+    </div>
+  </div>`;
+};
+
+/* ---------- Marketplace ---------- */
+pages.marketplace = () => `
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Marketplace</h1>
+      <p class="page-sub">Pesanan ditarik otomatis setiap 3 menit.</p>
+    </div>
+  </div>
+  <div style="margin-bottom:24px;padding:14px 16px;background:var(--blue-bg);border:1px solid var(--blue-br);
+    border-radius:var(--r);display:flex;gap:10px;align-items:flex-start">
+    ${icon('info',20,'#1D4ED8')}
+    <div style="font-size:13px;color:var(--blue-fg);line-height:1.5">
+      Integrasi marketplace belum aktif. Kartu di bawah memakai data contoh — sambungan asli dibuat
+      setelah aplikasi disetujui Shopee Open Platform, Tokopedia Seller API dan TikTok Shop Partner Center.
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;align-items:start">
+    ${DATA.channels.map(c => `
+      <div class="card card-pad">
+        <div class="row" style="align-items:flex-start;justify-content:space-between">
+          <div class="row" style="gap:12px">
+            <div style="width:44px;height:44px;border-radius:var(--r);border:1px solid var(--border);
+              background:var(--bg);display:flex;align-items:center;justify-content:center;font-weight:700">${c.initials}</div>
+            <div class="stack">
+              <span style="font-size:16px;font-weight:600">${c.name}</span>
+              <span style="font-size:13px;color:var(--text-2)">${c.shop}</span>
+            </div>
+          </div>
+          <span class="chip ${c.connected?'chip-green':'chip-red'}">${c.connected?'Terhubung':'Terputus'}</span>
+        </div>
+        ${c.connected ? '' : `
+          <div style="margin-top:20px;padding:12px 14px;background:var(--red-bg);border:1px solid var(--red-br);
+            border-radius:var(--r);font-size:13px;color:#7F1D1D;line-height:1.5">
+            Pesanan baru tidak masuk sejak sambungan terputus. Masuk ke akun toko untuk menyetujui ulang izin.
+          </div>`}
+        <div style="height:1px;background:var(--divider);margin:20px 0"></div>
+        <div class="row" style="justify-content:space-between;align-items:flex-end">
+          <div class="stack">
+            <span style="font-size:12px;color:var(--text-2)">Sinkron Terakhir</span>
+            <span style="font-size:14px;font-weight:500">${c.sync}</span>
+          </div>
+          <div class="stack" style="align-items:flex-end;gap:6px">
+            <button class="btn btn-sm ${c.connected?'':'btn-primary'}" ${c.connected||!can('reconnectChannel')?'disabled':''}
+              title="${c.connected?'Hanya aktif bila sambungan terputus':''}"
+              onclick="toast('Sambungan ${c.name} dibuat setelah kredensial API tersedia')">Hubungkan Ulang</button>
+            ${c.connected?'<span style="font-size:11px;color:var(--text-3)">Sambungan masih aktif</span>':''}
+          </div>
+        </div>
+      </div>`).join('')}
+  </div>`;
+
+/* ---------- Pengaturan ---------- */
+pages.pengaturan = () => {
+  const showUsers = can('manageUsers');
+  const tab = showUsers ? state.settingsTab : 'kategori';
+  const q = state.userQ.trim().toLowerCase();
+  const users = DATA.users.filter(u => !q || u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q));
+  return `
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Pengaturan</h1>
+      <p class="page-sub">Kelola pengguna dan kategori produk.</p>
+    </div>
+  </div>
+
+  ${showUsers ? `
+    <div class="tabs-line">
+      <button class="tab-line ${tab==='pengguna'?'on':''}" onclick="state.settingsTab='pengguna';render()">Pengguna</button>
+      <button class="tab-line ${tab==='kategori'?'on':''}" onclick="state.settingsTab='kategori';render()">Kategori</button>
+    </div>` : ''}
+
+  ${tab === 'pengguna' ? `
+    <div class="card" style="max-width:1040px">
+      <div class="toolbar">
+        <div class="search" style="flex:1;max-width:300px">
+          ${icon('search',20,'#9CA3AF')}
+          <input class="input" data-fid="user-q" placeholder="Cari pengguna"
+            value="${esc(state.userQ)}" oninput="state.userQ=this.value;render()">
+        </div>
+        <div class="spacer"></div>
+        <button class="btn btn-primary" onclick="openModal('user','add')">
+          ${icon('plus',20,'currentColor',1.9)} Tambah Pengguna</button>
+      </div>
+      ${users.length ? `
+      <table>
+        <thead><tr>
+          <th>Nama</th><th>Email</th><th style="width:180px">Peran</th>
+          <th style="width:150px">Status</th><th class="right" style="width:150px">Aksi</th>
+        </tr></thead>
+        <tbody>
+          ${users.map(u => `
+            <tr>
+              <td><span class="row" style="gap:10px">
+                <span style="width:30px;height:30px;border-radius:999px;background:var(--divider);color:#475569;
+                  display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:600">${initials(u.name)}</span>
+                <span style="font-weight:500">${u.name}</span>
+              </span></td>
+              <td class="muted">${u.email}</td>
+              <td><span class="chip ${u.role==='Owner'?'chip-blue':'chip-grey'}">${u.role}</span></td>
+              <td><span class="chip ${u.active?'chip-green':'chip-grey'}">${u.active?'Aktif':'Nonaktif'}</span></td>
+              <td class="right" style="padding-right:16px">
+                <button class="icon-btn" title="${u.role==='Owner'?'Ubah kata sandi saya':'Atur ulang kata sandi'}"
+                  onclick="openModal('password','edit',userBy('${u.email}'))">${icon('lock',18)}</button>
+                <button class="icon-btn" title="Edit pengguna"
+                  onclick="openModal('user','edit',userBy('${u.email}'))">${icon('pencil',18)}</button>
+                ${u.role==='Owner' ? '' : `<button class="icon-btn del" title="Nonaktifkan akun" ${u.active?'':'disabled'}
+                  onclick="deactivateUser(userBy('${u.email}'))">${icon('trash',18)}</button>`}
+              </td>
+            </tr>`).join('')}
+        </tbody>
+      </table>`
+      : emptyState('Pengguna tidak ditemukan','Coba nama atau email lain.')}
+    </div>`
+  : `
+    <div class="card" style="max-width:720px">
+      <div class="card-head">
+        <h2 class="card-title">Kategori Produk</h2>
+        <button class="btn btn-primary" onclick="openModal('category','add')">
+          ${icon('plus',20,'currentColor',1.9)} Tambah Kategori</button>
+      </div>
+      <table>
+        <thead><tr>
+          <th>Nama Kategori</th><th class="right" style="width:160px">Jumlah Produk</th>
+          <th class="right" style="width:110px">Aksi</th>
+        </tr></thead>
+        <tbody>
+          ${DATA.categories.map(c => `
+            <tr>
+              <td style="font-weight:500">${c}</td>
+              <td class="right muted">${DATA.products.filter(p => p.category === c).length}</td>
+              <td class="right" style="padding-right:16px">
+                <button class="icon-btn" title="Edit kategori" onclick="openModal('category','edit','${c}')">${icon('pencil',18)}</button>
+                <button class="icon-btn del" title="Hapus kategori" onclick="deleteCategory('${c}')">${icon('trash',18)}</button>
+              </td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`}`;
+};
+const userBy = (email) => DATA.users.find(u => u.email === email);
+
+/* ============================================================================
+   MODALS
+   ============================================================================ */
+const modals = {};
+const fieldErr = (k) => state.formErr[k] ? `<div class="hint err">${state.formErr[k]}</div>` : '';
+const bad = (k) => state.formErr[k] ? 'error' : '';
+
+modals.product = () => {
+  const edit = state.modalMode === 'edit';
+  const f = state.form;
+  return `
+  <div class="overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <div class="modal-head">
+        <h2 class="card-title">${edit?'Edit Produk':'Buat Produk'}</h2>
+        <button class="icon-btn" onclick="closeModal()">${icon('close',20,'currentColor',1.8)}</button>
+      </div>
+      <div class="modal-body grid2">
+        <div class="field span2">
+          <label class="label">Nama Produk <span class="req">*</span></label>
+          <input class="input ${bad('name')}" data-fid="p-name" placeholder="Contoh: Kemeja Oxford Lengan Panjang"
+            value="${esc(f.name)}" oninput="setForm('name',this.value)">
+          ${fieldErr('name')}
+        </div>
+        <div class="field">
+          <label class="label">SKU Induk <span class="req">*</span></label>
+          <input class="input mono ${bad('sku')}" data-fid="p-sku" placeholder="KMJ-OXF"
+            value="${esc(f.sku)}" oninput="setForm('sku',this.value.toUpperCase())">
+          ${state.formErr.sku ? fieldErr('sku') : `<div class="hint">Awalan SKU varian: ${f.sku||'KMJ-OXF'}-NVY-L</div>`}
+        </div>
+        <div class="field">
+          <label class="label">Kategori <span class="req">*</span></label>
+          ${selectBox(DATA.categories, f.category, "setForm('category',this.value)")}
+        </div>
+        <div class="field">
+          <label class="label">Batas Stok Menipis</label>
+          <input class="input" data-fid="p-thr" inputmode="numeric" value="${esc(f.threshold)}"
+            oninput="setForm('threshold',this.value.replace(/[^0-9]/g,''))">
+          <div class="hint">Batas masuk daftar Perlu Perhatian.</div>
+        </div>
+        <div class="field span2">
+          <label class="label">Foto Produk</label>
+          <div class="row" style="gap:16px;align-items:stretch">
+            ${photoBox(96,'foto utama')}
+            <div class="upload" style="flex:1" onclick="toast('Unggah foto aktif setelah Supabase Storage tersambung')">
+              ${icon('upload',22,'#94A3B8',1.6)}
+              <span style="font-size:13px;font-weight:500;color:var(--grey-fg)">Unggah foto</span>
+              <span style="font-size:12px;color:var(--text-2)">JPG atau PNG, maksimal 2 MB</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-secondary" onclick="closeModal()">Batal</button>
+        <button class="btn btn-primary" onclick="saveProduct()">${edit?'Simpan Perubahan':'Simpan Produk'}</button>
+      </div>
+    </div>
+  </div>`;
+};
+
+modals.variant = () => {
+  const edit = state.modalMode === 'edit';
+  const f = state.form;
+  return `
+  <div class="overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <div class="modal-head">
+        <h2 class="card-title">${edit?'Edit Varian':'Tambah Varian'}</h2>
+        <button class="icon-btn" onclick="closeModal()">${icon('close',20,'currentColor',1.8)}</button>
+      </div>
+      <div class="modal-body grid2">
+        <div class="field span2">
+          <label class="label">Kode Varian <span class="req">*</span></label>
+          <div class="sku-input">
+            <span class="sku-prefix">${f.parent}-</span>
+            <input data-fid="v-code" placeholder="NVY-L" value="${esc(f.code)}"
+              oninput="setForm('code',this.value.toUpperCase())">
+          </div>
+          ${state.formErr.code ? fieldErr('code')
+            : `<div class="hint">SKU lengkap: <strong class="mono" style="color:var(--text)">${f.parent}-${f.code||'…'}</strong></div>`}
+        </div>
+        <div class="field">
+          <label class="label">Warna <span class="req">*</span></label>
+          <input class="input ${bad('color')}" data-fid="v-color" placeholder="Navy"
+            value="${esc(f.color)}" oninput="setForm('color',this.value)">
+          ${fieldErr('color')}
+        </div>
+        <div class="field">
+          <label class="label">Ukuran <span class="req">*</span></label>
+          ${selectBox(['S','M','L','XL','XXL','30','32','34','36'], f.size, "setForm('size',this.value)")}
+        </div>
+        <div class="field">
+          <label class="label">Harga <span class="req">*</span></label>
+          <input class="input ${bad('price')}" data-fid="v-price" inputmode="numeric" placeholder="189000"
+            value="${esc(f.price)}" oninput="setForm('price',this.value.replace(/[^0-9]/g,''))">
+          ${state.formErr.price ? fieldErr('price')
+            : `<div class="hint">${f.price ? rupiah(+f.price) : 'Ketik angka saja, tanpa titik.'}</div>`}
+        </div>
+        <div class="field">
+          <label class="label">Status</label>
+          ${selectBox(['Aktif','Nonaktif'], f.active?'Aktif':'Nonaktif', "setForm('active',this.value==='Aktif')")}
+          <div class="hint">Varian nonaktif disembunyikan dari Stok Masuk dan Stok Keluar.</div>
+        </div>
+        <div class="field">
+          <label class="label">Foto</label>
+          <div class="upload" style="height:96px" onclick="toast('Unggah foto aktif setelah Supabase Storage tersambung')">
+            ${icon('upload',22,'#94A3B8',1.6)}
+            <span style="font-size:12px;color:var(--text-2)">Unggah foto varian</span>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Pratinjau Barcode</label>
+          <div style="height:96px;border:1px solid var(--border);border-radius:var(--r);
+            display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px">
+            ${barcodeBox(150,44)}
+            <span style="font:11px var(--mono);color:var(--text-2)">${f.parent}-${f.code||'NVY-L'}</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-secondary" onclick="closeModal()">Batal</button>
+        <button class="btn btn-primary" onclick="saveVariant()">Simpan</button>
+      </div>
+    </div>
+  </div>`;
+};
+
+modals.preview = () => {
+  const v = state.editing;
+  return `
+  <div class="overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal preview">
+      <div class="modal-head">
+        <div class="stack">
+          <span style="font-size:16px;font-weight:600">${nameOf(v.sku)}</span>
+          <span class="mono" style="color:var(--text-2)">${v.sku}</span>
+        </div>
+        <button class="icon-btn" onclick="closeModal()">${icon('close',20,'currentColor',1.8)}</button>
+      </div>
+      <div style="padding:20px;display:flex;flex-direction:column;gap:16px">
+        <div class="photo" style="height:280px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:12px">
+          <span style="font:11px var(--mono);color:#94A3B8;background:rgba(255,255,255,.85);
+            padding:4px 8px;border-radius:6px">foto varian</span>
+        </div>
+        <div style="border:1px solid var(--border);border-radius:var(--r);padding:16px;
+          display:flex;flex-direction:column;align-items:center;gap:8px">
+          ${barcodeBox(240,56)}
+          <span style="font:12px var(--mono);color:var(--text-2);letter-spacing:.06em">${v.sku}</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;
+          border-top:1px solid var(--divider);padding-top:16px">
+          ${[['Warna',v.color],['Ukuran',v.size],['Harga',rupiah(v.price)]].map(([k,val]) => `
+            <div class="stack" style="gap:4px">
+              <span style="font-size:12px;color:var(--text-2)">${k}</span>
+              <span style="font-size:14px;font-weight:600">${val}</span>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>
+  </div>`;
+};
+
+/* One confirm dialog for every destructive action — the caller supplies the
+   wording and what happens on OK. */
+modals.confirm = () => {
+  const c = state.confirm;
+  return `
+  <div class="overlay" onclick="if(event.target===this){state.modal=null;state.confirm=null;render()}">
+    <div class="modal sm" style="padding:24px">
+      <div class="row" style="gap:16px;align-items:flex-start">
+        <div style="width:44px;height:44px;border-radius:var(--r);background:${c.danger?'var(--red-bg)':'var(--blue-bg)'};
+          display:flex;align-items:center;justify-content:center;flex:none">
+          ${icon(c.danger?'warning':'info',22,c.danger?'#EF4444':'#2563EB',1.8)}
+        </div>
+        <div>
+          <h2 class="card-title">${c.title}</h2>
+          <p style="margin:8px 0 0;font-size:14px;color:var(--text-2);line-height:1.5">${c.body}</p>
+        </div>
+      </div>
+      <div class="row" style="justify-content:flex-end;gap:12px;margin-top:24px">
+        <button class="btn btn-secondary" onclick="state.modal=null;state.confirm=null;render()">Batal</button>
+        <button class="btn ${c.danger?'btn-danger':'btn-primary'}" onclick="confirmOk()">${c.label}</button>
+      </div>
+    </div>
+  </div>`;
+};
+
+modals.user = () => {
+  const edit = state.modalMode === 'edit';
+  const f = state.form;
+  return `
+  <div class="overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <div class="modal-head">
+        <h2 class="card-title">${edit?'Edit Pengguna':'Tambah Pengguna'}</h2>
+        <button class="icon-btn" onclick="closeModal()">${icon('close',20,'currentColor',1.8)}</button>
+      </div>
+      <div class="modal-body grid2">
+        <div class="field span2">
+          <label class="label">Nama Lengkap <span class="req">*</span></label>
+          <input class="input ${bad('name')}" data-fid="u-name" placeholder="Contoh: Bagas Nugroho"
+            value="${esc(f.name)}" oninput="setForm('name',this.value)">
+          ${fieldErr('name')}
+        </div>
+        <div class="field span2">
+          <label class="label">Email <span class="req">*</span></label>
+          <input class="input ${bad('email')}" data-fid="u-email" placeholder="nama@kanona.id"
+            value="${esc(f.email)}" oninput="setForm('email',this.value)">
+          ${fieldErr('email')}
+        </div>
+        <div class="field">
+          <label class="label">Peran <span class="req">*</span></label>
+          ${f.role === 'Owner'
+            ? '<div class="input" style="background:var(--bg);color:var(--text-2);display:flex;align-items:center">Owner</div>'
+            : selectBox(['Manager','Admin'], f.role, "setForm('role',this.value)")}
+          <div class="hint">${f.role === 'Owner' ? 'Hanya ada satu Owner.' : 'Manager boleh mencatat stok keluar manual.'}</div>
+        </div>
+        ${edit ? `
+          <div class="field">
+            <label class="label">Status Akun</label>
+            <div class="row" style="gap:8px">
+              <button class="btn btn-sm" style="flex:1;justify-content:center;${f.active
+                ? 'background:var(--green-bg);border:1px solid var(--green-br);color:var(--green-fg);font-weight:600'
+                : 'background:#fff;border:1px solid var(--border);color:var(--text-2)'}"
+                onclick="setForm('active',true)">Aktif</button>
+              <button class="btn btn-sm" style="flex:1;justify-content:center;${!f.active
+                ? 'background:var(--red-bg);border:1px solid var(--red-br);color:var(--red-fg);font-weight:600'
+                : 'background:#fff;border:1px solid var(--border);color:var(--text-2)'}"
+                onclick="setForm('active',false)">Nonaktif</button>
+            </div>
+            <div class="hint">${f.active ? 'Akun dapat masuk ke sistem seperti biasa.' : 'Akun tidak bisa masuk. Riwayatnya tetap tersimpan.'}</div>
+          </div>` : `
+          <div class="field">
+            <label class="label">Kata Sandi Awal <span class="req">*</span></label>
+            <input class="input ${bad('password')}" data-fid="u-pass" type="password" placeholder="Minimal 8 karakter"
+              value="${esc(f.password)}" oninput="setForm('password',this.value)">
+            ${state.formErr.password ? fieldErr('password') : '<div class="hint">Sampaikan langsung kepada karyawan.</div>'}
+          </div>`}
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-secondary" onclick="closeModal()">Batal</button>
+        <button class="btn btn-primary" onclick="saveUser()">${edit?'Simpan Perubahan':'Buat Akun'}</button>
+      </div>
+    </div>
+  </div>`;
+};
+
+modals.password = () => {
+  const self = state.editing.email === DATA.me.email;
+  const f = state.form;
+  return `
+  <div class="overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal sm">
+      <div class="modal-head">
+        <h2 class="card-title">${self?'Ubah Kata Sandi':'Atur Ulang Kata Sandi'}</h2>
+        <button class="icon-btn" onclick="closeModal()">${icon('close',20,'currentColor',1.8)}</button>
+      </div>
+      <div class="modal-body">
+        ${self ? '' : `<p class="page-sub" style="margin:0 0 20px">Kata sandi baru untuk <strong>${state.editing.name}</strong>. Sampaikan langsung kepada yang bersangkutan.</p>`}
+        ${self ? `
+          <div class="field" style="margin-bottom:16px">
+            <label class="label">Kata Sandi Saat Ini <span class="req">*</span></label>
+            <input class="input ${bad('current')}" data-fid="pw-cur" type="password"
+              value="${esc(f.current)}" oninput="setForm('current',this.value)">
+            ${fieldErr('current')}
+          </div>` : ''}
+        <div class="field" style="margin-bottom:16px">
+          <label class="label">Kata Sandi Baru <span class="req">*</span></label>
+          <input class="input ${bad('next')}" data-fid="pw-new" type="password" placeholder="Minimal 8 karakter"
+            value="${esc(f.next)}" oninput="setForm('next',this.value)">
+          ${fieldErr('next')}
+        </div>
+        <div class="field">
+          <label class="label">Ulangi Kata Sandi Baru <span class="req">*</span></label>
+          <input class="input ${bad('confirm')}" data-fid="pw-conf" type="password"
+            value="${esc(f.confirm)}" oninput="setForm('confirm',this.value)">
+          ${fieldErr('confirm')}
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-secondary" onclick="closeModal()">Batal</button>
+        <button class="btn btn-primary" onclick="savePassword()">Simpan</button>
+      </div>
+    </div>
+  </div>`;
+};
+
+modals.category = () => {
+  const edit = state.modalMode === 'edit';
+  return `
+  <div class="overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal sm">
+      <div class="modal-head">
+        <h2 class="card-title">${edit?'Edit Kategori':'Tambah Kategori'}</h2>
+        <button class="icon-btn" onclick="closeModal()">${icon('close',20,'currentColor',1.8)}</button>
+      </div>
+      <div class="modal-body">
+        <div class="field">
+          <label class="label">Nama Kategori <span class="req">*</span></label>
+          <input class="input ${bad('name')}" data-fid="c-name" placeholder="Contoh: Kemeja"
+            value="${esc(state.form.name)}" oninput="setForm('name',this.value)"
+            onkeydown="if(event.key==='Enter')saveCategory()">
+          ${state.formErr.name ? fieldErr('name') : '<div class="hint">Dipakai untuk filter di halaman Produk dan Barcode.</div>'}
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-secondary" onclick="closeModal()">Batal</button>
+        <button class="btn btn-primary" onclick="saveCategory()">${edit?'Simpan Perubahan':'Simpan Kategori'}</button>
+      </div>
+    </div>
+  </div>`;
+};
+
+/* ============================================================================
+   RENDER
+   ----------------------------------------------------------------------------
+   The whole screen is rebuilt on every change, which is simple to follow but
+   throws away the focused field — so the caret is put back afterwards by
+   data-fid. React keeps the DOM between renders and needs none of this.
+   ============================================================================ */
+function render(){
+  const a = document.activeElement;
+  const fid = a && a.dataset ? a.dataset.fid : null;
+  let pos = null;
+  try { pos = a && a.selectionStart != null ? [a.selectionStart, a.selectionEnd] : null; } catch(e){}
+
+  document.getElementById('app').innerHTML = state.authed
+    ? shell((pages[state.page] || pages.dashboard)())
+    : loginPage();
+
+  /* indeterminate is a property, not an attribute — it cannot be set in HTML */
+  document.querySelectorAll('[data-indet="1"]').forEach(el => { el.indeterminate = true; });
+
+  if (fid){
+    const el = document.querySelector(`[data-fid="${fid}"]`);
+    if (el){
+      el.focus();
+      try { if (pos && el.setSelectionRange) el.setSelectionRange(pos[0], pos[1]); } catch(e){}
+    }
+  }
+}
+render();
+</script>
+</body>
+</html>
